@@ -26,10 +26,9 @@ class WallPosition : Position
 {
 public:
     enum class Direction { horizontal, vertical };
-    WallPosition() {};
+    WallPosition(Direction direction): direction_(direction) {};
 
 private:
     Direction direction_;
-
 };
 

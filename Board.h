@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Player.h"
 #include "Position.h"
 
 #include <vector>
@@ -10,6 +11,7 @@ class Board
 public:
     Board();
     ~Board();
+
 private:
     unsigned int width_;
     unsigned int heigth_;
