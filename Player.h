@@ -1,11 +1,10 @@
 #pragma once
 
+#include "Common.h"
 #include "Position.h"
 #include "Board.h"
 
-#include <string>
 #include <vector>
-#include <memory>
 
 class Player
 {
@@ -14,16 +13,14 @@ public:
 
 public:
     Player();
-    //Player(const std::shared_ptr<Board> & board);
     ~Player();
-    //std::vector<Position *> getNextMove(const Board &board);
+    std::vector<Position *> getNextMove(const Board &board);
 
 private:
-    std::string name_;
+    PlayerName name_;
     Color color_;
     unsigned int walls_;
     Position startPosition_;
-    //std::shared_ptr<Board> board_;
 
 };
 

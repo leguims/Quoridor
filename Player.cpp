@@ -5,11 +5,6 @@ Player::Player()
 {
 }
 
-//Player::Player(const std::shared_ptr<Board> & board) : board_(board)
-//{
-//}
-//
-
 Player::~Player()
 {
 }
