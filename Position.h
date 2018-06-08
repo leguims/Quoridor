@@ -15,6 +15,7 @@ public:
     unsigned int y(const unsigned int y);
     unsigned int x(const std::string & x);
     unsigned int y(const std::string & y);
+    void restore(const std::string&);
     std::string& save() const;
 
 private:
@@ -29,6 +30,7 @@ public:
     PlayerPosition(const unsigned int x, const unsigned int y, const PlayerName& playerName) : Position(x, y), playerName_(playerName) {}
     PlayerPosition(const std::string & playerPosition, const PlayerName& playerName="") : Position(playerPosition.substr(0, 2)), playerName_(playerName) {}
     PlayerPosition& operator=(const PlayerPosition&) = default;
+    ~PlayerPosition() = default;
 
     void playerName(const PlayerName& playerName) { playerName_ = playerName; }
     void restore(const std::string&);
@@ -49,6 +51,7 @@ public:
     WallPosition(const unsigned int x, const unsigned int y, const Direction& direction) : Position(x, y), direction_(direction) {}
     WallPosition(const std::string & wallPosition) : Position(wallPosition.substr(0, 2)), direction_(direction(wallPosition.substr(2, 1))) {}
     WallPosition& operator=(const WallPosition&) = default;
+    ~WallPosition() = default;
 
     void direction(const Direction& direction) { direction_ = direction; }
     Direction direction(const std::string&);

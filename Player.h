@@ -12,9 +12,11 @@ public:
     enum class Color { red, blue, white, black };
 
 public:
-    Player();
-    ~Player();
-    std::vector<Position *> getNextMove(const Board &board);
+    Player() = default;
+    Player(const PlayerName &name, const Color &color, const Position &startPosition);
+    Player& operator=(const Player&) = default;
+    ~Player() = default;
+    std::vector<Position *> getNextMove(const unsigned int &round, const Board &board);
 
 private:
     PlayerName name_;

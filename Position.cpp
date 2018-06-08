@@ -33,6 +33,12 @@ unsigned int Position::y(const std::string& text)
     return y(std::stoul(text.substr(1, 1)));
 }
 
+void Position::restore(const std::string &text)
+{
+    x(text.substr(0, 1));
+    y(text.substr(1, 1));
+}
+
 std::string & Position::save() const
 {
     std::string text;
@@ -57,8 +63,7 @@ WallPosition::Direction WallPosition::direction(const std::string & text)
 
 void WallPosition::restore(const std::string &text)
 {
-    x(text.substr(0, 1));
-    y(text.substr(1, 1));
+    Position::restore(text);
     direction(text.substr(2, 1));
 }
 
@@ -81,8 +86,7 @@ std::string & WallPosition::saveDirection() const
 
 void PlayerPosition::restore(const std::string &text)
 {
-    x(text.substr(0, 1));
-    y(text.substr(1, 1));
+    Position::restore(text);
 }
 
 void PlayerPosition::restore(const std::string &text, const PlayerName &playerNameText)

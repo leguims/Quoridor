@@ -1,15 +1,19 @@
 #include "Game.h"
 #include <string>
 
-void Game::ChooseReferee()
+void Game::chooseReferee()
 {
 }
 
-void Game::ChoosePlayers()
+void Game::choosePlayers()
 {
 }
 
-Game::Result Game::getResult()
+void Game::launch()
+{
+}
+
+Game::Result Game::getResult() const
 {
     return Game::Result::inProgress;
 }
