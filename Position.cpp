@@ -84,18 +84,18 @@ std::string & WallPosition::saveDirection() const
     return text;
 }
 
-void PlayerPosition::restore(const std::string &text)
+void PawnPosition::restore(const std::string &text)
 {
     Position::restore(text);
 }
 
-void PlayerPosition::restore(const std::string &text, const PlayerName &playerNameText)
+void PawnPosition::restore(const std::string &text, const PlayerName &playerNameText)
 {
-    PlayerPosition::restore(text.substr(0, 2));
+    PawnPosition::restore(text.substr(0, 2));
     playerName(playerNameText);
 }
 
-std::string & PlayerPosition::save() const
+std::string & PawnPosition::save() const
 {
     auto text = Position::save();
     text += playerName_;

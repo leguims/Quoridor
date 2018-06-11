@@ -23,14 +23,14 @@ private:
     unsigned int y_;
 };
 
-class PlayerPosition : public Position
+class PawnPosition : public Position
 {
 public:
-    PlayerPosition() = default;
-    PlayerPosition(const unsigned int x, const unsigned int y, const PlayerName& playerName) : Position(x, y), playerName_(playerName) {}
-    PlayerPosition(const std::string & playerPosition, const PlayerName& playerName="") : Position(playerPosition.substr(0, 2)), playerName_(playerName) {}
-    PlayerPosition& operator=(const PlayerPosition&) = default;
-    ~PlayerPosition() = default;
+    PawnPosition() = default;
+    PawnPosition(const unsigned int x, const unsigned int y, const PlayerName& playerName) : Position(x, y), playerName_(playerName) {}
+    PawnPosition(const std::string & playerPosition, const PlayerName& playerName="") : Position(playerPosition.substr(0, 2)), playerName_(playerName) {}
+    PawnPosition& operator=(const PawnPosition&) = default;
+    ~PawnPosition() = default;
 
     void playerName(const PlayerName& playerName) { playerName_ = playerName; }
     void restore(const std::string&);
@@ -65,3 +65,27 @@ private:
     std::string& saveDirection() const;
 };
 
+class Move
+{
+public:
+    enum class Type { pawn, wall, none };
+    Move() : type_{ Type::none }, player_{}, wall_{} {}
+    Move(const PawnPosition &player) : type_{ Type::pawn }, player_{ player }, wall_{} {}
+    Move(const WallPosition &wall) : type_{ Type::wall }, player_{}, wall_{ wall } {}
+    Move(const std::string &text) : type_{ type(text) }, player_{ type_ == Type::pawn ? PawnPosition(text) : PawnPosition() }, wall_{ type_ == Type::wall ? WallPosition(text) : WallPosition() } {}
+
+    std::string & save() const;
+    void restore(const std::string &move);
+    Type type(const std::string &text);
+
+    friend std::ostream& operator<<(std::ostream& out, const Move& move)
+    {
+        out << move.save();
+        return out;
+    }
+
+private:
+    Type type_;
+    PawnPosition player_;
+    WallPosition wall_;
+};

@@ -6,8 +6,8 @@ Player::Player(const PlayerName & name, const Color & color, const Position & st
 {
 }
 
-std::vector<Position *> Player::getNextMove(const unsigned int &round, const Board & board)
+const Move& Player::getNextMove(const unsigned int &round, const Board &board)
 {
-    return std::vector<Position *>();
+    return Move("e7");
 }
 

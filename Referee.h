@@ -6,16 +6,17 @@
 class Referee
 {
 public:
-    Referee();
+    Referee() = default;
     //Referee(const std::shared_ptr<Board> & board);
-    ~Referee();
+    ~Referee() = default;
 
     bool Win(const Player & player);
-    bool ValidPutWall();
-    bool ValidMovePawn();
-    std::vector<WallPosition *> getValidWalls();
-    std::vector<PlayerPosition *> getValidMoves();
-    std::vector<Position *> getValidPlays();
+    bool ValidWall(const WallPosition &);
+    bool ValidPawn(const PawnPosition &);
+    bool ValidMove(const Move &);
+    std::vector<WallPosition>& getValidWalls();
+    std::vector<PawnPosition>& getValidPawns();
+    std::vector<Move>& getValidMoves();
 
 private:
     //std::shared_ptr<Board> board_;

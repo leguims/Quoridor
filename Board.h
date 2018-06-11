@@ -13,7 +13,7 @@ public:
 private:
     unsigned int width_;
     unsigned int heigth_;
-    std::vector<PlayerPosition> playersPosition_;
+    std::vector<PawnPosition> playersPosition_;
     std::vector<WallPosition> wallsPosition_;
 };
 

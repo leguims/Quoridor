@@ -1,11 +1,6 @@
 #include "Referee.h"
 
-
-Referee::Referee()
+bool Referee::ValidMove(const Move &)
 {
-}
-
-
-Referee::~Referee()
-{
+    return true;
 }
