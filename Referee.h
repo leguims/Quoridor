@@ -18,6 +18,12 @@ public:
     std::vector<PawnPosition>& getValidPawns();
     std::vector<Move>& getValidMoves();
 
+    friend std::ostream& operator<<(std::ostream& out, const Referee& referee)
+    {
+        out << "Classic";
+        return out;
+    }
+
 private:
     //std::shared_ptr<Board> board_;
 

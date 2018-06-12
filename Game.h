@@ -8,6 +8,12 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <ostream>
+
+// for date
+#include <chrono>  // chrono::system_clock
+#include <ctime>   // localtime
+#include <iomanip> // put_time
 
 class Game
 {
@@ -31,16 +37,44 @@ public:
         return out;
     }
 
-
 public:
-    Game() : board_{}, players_{}, moveList_{}, inGame{ false }, index_player{ 0 } {};
+    Game() : board_{}, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
     ~Game() = default;
     void chooseReferee();
     void choosePlayers();
     void launch();
     void move();
-    void save();
+    //void save();
     Result getResult() const;
+
+    friend std::ostream& operator<<(std::ostream& out, const Game& game)
+    {
+        // Save to file the game.
+
+        auto now = std::chrono::system_clock::now(); 
+        auto in_time_t = std::chrono::system_clock::to_time_t(now);
+#pragma warning(suppress : 4996) // to use std::localtime() deprecated
+        out << "Date : " << std::put_time(std::localtime(&in_time_t), "%d/%m/%Y %H:%M:%S") << std::endl;
+
+        out << "Rules : " << game.referee_ << std::endl;
+
+        auto index = 1;
+        for (const auto &player : game.players_)
+        {
+            out << "Player " << index ++ << " : " << player << std::endl;
+        }
+
+        out << "Result : " << game.getResult() << std::endl;
+
+        out << "Game moves : " << std::endl;
+        index = 1;
+        for (const auto &move : game.moveList_)
+        {
+            out << index++ << "." << move.first << "\t" << move.second << std::endl;
+        }
+
+        return out;
+    }
 
 private:
     Referee referee_;
@@ -49,6 +83,7 @@ private:
     std::vector<std::pair<Move, Move>> moveList_;
 
     bool inGame;
-    unsigned short index_player;
+    int index_player_;
+    int round_;
 };
 

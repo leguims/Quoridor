@@ -30,21 +30,13 @@ unsigned int Position::y(const std::string& text)
 {
     if (text.size() != 1)
         throw std::out_of_range("Y should have size to 1 not " + text.size());
-    return y(std::stoul(text.substr(1, 1)));
+    return y(std::stoul(text.substr(0, 1)));
 }
 
 void Position::restore(const std::string &text)
 {
     x(text.substr(0, 1));
     y(text.substr(1, 1));
-}
-
-std::string & Position::save() const
-{
-    std::string text;
-    text += std::to_string('a' + x_ - 1);
-    text += std::to_string(y_);
-    return text;
 }
 
 WallPosition::Direction WallPosition::direction(const std::string & text)
@@ -67,23 +59,6 @@ void WallPosition::restore(const std::string &text)
     direction(text.substr(2, 1));
 }
 
-std::string & WallPosition::save() const
-{
-    auto text = Position::save();
-    text += saveDirection();
-    return text;
-}
-
-std::string & WallPosition::saveDirection() const
-{
-    std::string text;
-    if (direction_ == Direction::horizontal)
-        text = "h";
-    if (direction_ == Direction::vertical)
-        text = "v";
-    return text;
-}
-
 void PawnPosition::restore(const std::string &text)
 {
     Position::restore(text);
@@ -95,9 +70,27 @@ void PawnPosition::restore(const std::string &text, const PlayerName &playerName
     playerName(playerNameText);
 }
 
-std::string & PawnPosition::save() const
+void Move::restore(const std::string & text)
 {
-    auto text = Position::save();
-    text += playerName_;
-    return text;
+    type_ = type(text);
+
+    if (type_ == Type::pawn)
+    {
+        player_ = PawnPosition(text);
+    }
+    else if (type_ == Type::wall)
+    {
+        wall_ = WallPosition(text);
+    }
+}
+
+Move::Type Move::type(const std::string & text)
+{
+    if (text.size() == 2)
+        type_ = Type::pawn;
+    else if (text.size() == 3)
+        type_ = Type::wall;
+    else
+        type_ = Type::none;
+    return type_;
 }

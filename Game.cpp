@@ -23,35 +23,39 @@ void Game::launch()
 void Game::move()
 {
     // change player
-    auto round = moveList_.size();
-    index_player = ++index_player % players_.size();
-    auto move = players_.at(index_player).getNextMove(round, board_);
+    index_player_ = ++index_player_ % players_.size();
+    if (index_player_ == 0)
+        round_++;
+
+    auto move = players_.at(index_player_).getNextMove(round_, board_);
     if (referee_.ValidMove(move))
     {
-        if (index_player == 0)
+        if (index_player_ == 0)
         {
             // Save player 1 (and "none" for player 2)
             moveList_.emplace_back( std::make_pair(move, Move()) );
         }
-        else
+        else if (index_player_ == 1)
         {
             // Save player 2
-            moveList_.at(round).second = move;
+            moveList_.at(round_-1).second = move;
         }
+        else
+            throw std::out_of_range("Unexpected player " + index_player_);
     }
 }
 
-void Game::save()
-{
-    // Save to file the game.
-    std::cout << "Game moves : " << std::endl;
-    auto index = 1;
-    for (const auto &move : moveList_)
-    {
-        std::cout << index << "." << move.first << "\t" << move.second << std::endl;
-    }
-    std::cout << "Game saved." << std::endl;
-}
+//void Game::save()
+//{
+//    // Save to file the game.
+//    std::cout << "Game moves : " << std::endl;
+//    auto index = 1;
+//    for (const auto &move : moveList_)
+//    {
+//        std::cout << index << "." << move.first << "\t" << move.second << std::endl;
+//    }
+//    std::cout << "Game saved." << std::endl;
+//}
 
 Game::Result Game::getResult() const
 {
@@ -59,43 +63,4 @@ Game::Result Game::getResult() const
         return Game::Result::inProgress;
     else
         return Game::Result::draw;
-}
-
-std::string & Move::save() const
-{
-    std::string text;
-    if (type_ == Type::pawn)
-    {
-        text += player_.save();
-    }
-    else if (type_ == Type::wall)
-    {
-        text += wall_.save();
-    }
-    return text;
-}
-
-void Move::restore(const std::string & text)
-{
-    type_ = type(text);
-
-    if (type_ == Type::pawn)
-    {
-        player_ = PawnPosition(text);
-    }
-    else if (type_ == Type::wall)
-    {
-        wall_ = WallPosition(text);
-    }
-}
-
-Move::Type Move::type(const std::string & text)
-{
-    if (text.size() == 2)
-        type_ = Type::pawn;
-    else if (text.size() == 3)
-        type_ = Type::wall;
-    else
-        type_ = Type::none;
-    return type_;
 }
