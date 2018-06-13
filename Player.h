@@ -17,13 +17,16 @@ public:
     Player(const PlayerName &name, const Color &color, const Position &startPosition);
     Player& operator=(const Player&) = default;
     ~Player() = default;
-    const Move getNextMove(const unsigned int &round, const Board &board);
+    Move getNextMove(const unsigned int &round, const Board &board) const ;
+    const PlayerName& name() const { return name_; }
+    const Position& startPosition() const { return startPosition_; }
+    void removeWall() { --walls_; }
 
     friend std::ostream& operator<<(std::ostream& out, const Player& player)
     {
-        out << player.name_ 
-            << " (remains " << player.walls_ 
-            << " wall" << (player.walls_>1?"s":"") << ")";
+        out << player.name_
+            << " (remains " << player.walls_
+            << " wall" << (player.walls_ > 1 ? "s" : "") << ")";
         return out;
     }
 

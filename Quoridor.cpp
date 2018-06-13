@@ -34,14 +34,18 @@ int main()
     game.choosePlayers();
     game.launch();
 
-    game.move();
-    game.move();
-    game.move();
-    game.move();
-    game.move();
-    game.move();
-    game.move();
-    game.move();
+    game.move();    game.move();
+    game.move();    game.move();
+    game.move();    game.move();
+    game.move();    game.move();
+    game.move();    game.move();
+    game.move();    game.move();
+    game.move();    game.move();
+    game.move();    game.move();
+    game.move();    game.move();
+
+    game.move();    game.move();
+    game.move();    game.move();
 
     //game.save();
     std::cout << game;

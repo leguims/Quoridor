@@ -38,7 +38,7 @@ public:
     }
 
 public:
-    Game() : board_{}, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
+    Game() : board_{ std::make_shared<Board>() }, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
     ~Game() = default;
     void chooseReferee();
     void choosePlayers();
@@ -78,7 +78,8 @@ public:
 
 private:
     Referee referee_;
-    Board board_;
+    std::shared_ptr<Board> board_;
+    //Board board_;
     std::vector<Player> players_;
     std::vector<std::pair<Move, Move>> moveList_;
 

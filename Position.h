@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include <ostream>
+#include <tuple>
 
 class Position
 {
@@ -25,10 +26,25 @@ public:
         return out;
     }
 
+    friend bool operator<(const Position& l, const Position& r)
+    {
+        return std::tie(l.x_, l.y_) < std::tie(r.x_, r.y_); // keep the same order
+    }
+
+    friend bool operator==(const Position& lhs, const Position& rhs) {
+        return std::tie(lhs.x_, lhs.y_) == std::tie(rhs.x_, rhs.y_);
+    }
+
 private:
     unsigned int x_;
     unsigned int y_;
 };
+
+inline bool operator> (const Position& lhs, const Position& rhs) { return rhs < lhs; }
+inline bool operator<=(const Position& lhs, const Position& rhs) { return !(lhs > rhs); }
+inline bool operator>=(const Position& lhs, const Position& rhs) { return !(lhs < rhs); }
+inline bool operator!=(const Position& lhs, const Position& rhs) { return !(lhs == rhs); }
+
 
 class PawnPosition : public Position
 {
@@ -98,6 +114,8 @@ public:
 
     void restore(const std::string &move);
     Type type(const std::string &text);
+    Type type() const { return type_; }
+    void playerName(const PlayerName& playerName) { player_.playerName(playerName); }
 
     friend std::ostream& operator<<(std::ostream& out, const Move& move)
     {
