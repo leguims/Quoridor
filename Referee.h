@@ -29,6 +29,12 @@ public:
 
 private:
     std::shared_ptr<Board> board_;
+    bool ValidWallRange(const WallPosition &) const;
+    bool ValidWallAvailable(const WallPosition &) const;
+    bool ValidWallDoNotCloseTheArrival(const WallPosition &) const;
 
+    bool ValidPawnRange(const PawnPosition &) const;
+    bool ValidPawnFree(const PawnPosition &) const;
+    bool ValidPawnLegalMove(const PawnPosition &) const;
 };
 

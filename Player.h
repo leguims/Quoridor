@@ -20,6 +20,7 @@ public:
     Move getNextMove(const unsigned int &round, const Board &board) const ;
     const PlayerName& name() const { return name_; }
     const Position& startPosition() const { return startPosition_; }
+    bool haveWall() { return (walls_ > 0); }
     void removeWall() { --walls_; }
 
     friend std::ostream& operator<<(std::ostream& out, const Player& player)
