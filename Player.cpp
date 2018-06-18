@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-Player::Player(const PlayerName & name, const Color & color, const Position & startPosition):
+Player::Player(const PlayerName & name, const Color & color, const BoardPosition & startPosition):
     name_{ name }, color_{ color }, walls_{10}, startPosition_{startPosition}
 {
 }
@@ -27,6 +27,6 @@ Move Player::getNextMove(const unsigned int &round, const Board &board) const
     if ( (2*round) > move_list.size())
         return Move();
     else
-        return startPosition_==Position("e1")? Move(move_list[(round - 1) * 2]) : Move(move_list[(round - 1) * 2+1]) ;
+        return startPosition_==BoardPosition("e1")? Move(move_list[(round - 1) * 2]) : Move(move_list[(round - 1) * 2+1]) ;
 }
 

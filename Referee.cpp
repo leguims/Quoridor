@@ -2,7 +2,7 @@
 
 bool Referee::Win(const Player & player) const
 {
-	if (player.startPosition() == Position("e1"))
+	if (player.startPosition() == BoardPosition("e1"))
 	{
 		auto pl = board_->position(player.name());
 		for (const auto &arrival : { "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9", })
@@ -11,7 +11,7 @@ bool Referee::Win(const Player & player) const
 				return true;
 		}
 	}
-	else if (player.startPosition() == Position("e9"))
+	else if (player.startPosition() == BoardPosition("e9"))
 	{
 		auto pl = board_->position(player.name());
 		for (const auto &arrival : { "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", })

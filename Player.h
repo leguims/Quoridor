@@ -14,12 +14,12 @@ public:
 
 public:
     Player() = default;
-    Player(const PlayerName &name, const Color &color, const Position &startPosition);
+    Player(const PlayerName &name, const Color &color, const BoardPosition &startPosition);
     Player& operator=(const Player&) = default;
     ~Player() = default;
     Move getNextMove(const unsigned int &round, const Board &board) const ;
     const PlayerName& name() const { return name_; }
-    const Position& startPosition() const { return startPosition_; }
+    const BoardPosition& startPosition() const { return startPosition_; }
     bool haveWall() { return (walls_ > 0); }
     void removeWall() { --walls_; }
 
@@ -35,7 +35,7 @@ private:
     PlayerName name_;
     Color color_;
     unsigned int walls_;
-    Position startPosition_;
+    BoardPosition startPosition_;
 
 };
 

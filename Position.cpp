@@ -1,39 +1,37 @@
 #include "Position.h"
 
 
-unsigned int Position::x(const unsigned int x)
+const int BoardPosition::x(const int x)
 {
     if ((1 <= x) && (x <= 9))
-        x_ = x;
+        return Position::x(x);
     else
         throw std::out_of_range("X should be [1;9] not " + x);
-    return x_;
 }
 
-unsigned int Position::y(const unsigned int y)
+const int BoardPosition::y(const int y)
 {
     if ((1 <= y) && (y <= 9))
-        y_ = y;
+        return Position::y(y);
     else
         throw std::out_of_range("Y should be [1;9] not " + y);
-    return y_;
 }
 
-unsigned int Position::x(const std::string& text)
+const int BoardPosition::x(const std::string& text)
 {
     if (text.size() != 1)
         throw std::out_of_range("X should have size to 1 not " + text.size());
     return x(text[0] - 'a' + 1);
 }
 
-unsigned int Position::y(const std::string& text)
+const int BoardPosition::y(const std::string& text)
 {
     if (text.size() != 1)
         throw std::out_of_range("Y should have size to 1 not " + text.size());
     return y(std::stoul(text.substr(0, 1)));
 }
 
-void Position::restore(const std::string &text)
+void BoardPosition::restore(const std::string &text)
 {
     x(text.substr(0, 1));
     y(text.substr(1, 1));
@@ -55,13 +53,13 @@ WallPosition::Direction WallPosition::direction(const std::string & text)
 
 void WallPosition::restore(const std::string &text)
 {
-    Position::restore(text);
+    BoardPosition::restore(text);
     direction(text.substr(2, 1));
 }
 
 void PawnPosition::restore(const std::string &text)
 {
-    Position::restore(text);
+    BoardPosition::restore(text);
 }
 
 void PawnPosition::restore(const std::string &text, const PlayerName &playerNameText)

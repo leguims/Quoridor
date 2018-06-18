@@ -13,8 +13,8 @@ void Game::chooseReferee()
 void Game::choosePlayers()
 {
 	// Ask user to choose players : human, IA ?
-	players_.emplace_back("Player 1", Player::Color::black, Position("e1"));
-	players_.emplace_back("Player 2", Player::Color::red, Position("e9"));
+	players_.emplace_back("Player 1", Player::Color::black, BoardPosition("e1"));
+	players_.emplace_back("Player 2", Player::Color::red, BoardPosition("e9"));
 }
 
 void Game::launch()

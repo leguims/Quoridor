@@ -8,7 +8,7 @@
 int main()
 {
     {
-        Position position(5, 9);
+        BoardPosition position(5, 9);
         std::cout << "Position : " << position << std::endl;
     }
 

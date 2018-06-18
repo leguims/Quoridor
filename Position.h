@@ -7,28 +7,23 @@
 class Position
 {
 public:
-    Position() : x_(0), y_(0) {};
-    Position(const unsigned int x_value, const unsigned int y_value) { x(x_value); y(y_value); };
-    Position(const std::string& position) : x_{ x(position.substr(0, 1)) }, y_{ y(position.substr(1, 1)) } {}
+    Position() : x_(0), y_(0) {}
+    Position(const int x_value, const int y_value) : x_(x_value), y_(y_value) {}
     ~Position() = default;
-    const unsigned int x() const { return x_; }
-    const unsigned int y() const { return y_; }
-    unsigned int x(const unsigned int x);
-    unsigned int y(const unsigned int y);
-    unsigned int x(const std::string & x);
-    unsigned int y(const std::string & y);
-    void restore(const std::string&);
+    const int x() const { return x_; }
+    const int y() const { return y_; }
+    const int x(const int x_value) { x_ = x_value; return x_; }
+    const int y(const int y_value) { y_ = y_value; return y_; }
 
     friend std::ostream& operator<<(std::ostream& out, const Position& position)
     {
-        out << char('a' + position.x_ - 1);
-        out << position.y_;
+        out << "(" << position.x_ << ", " << position.y_ << ")";
         return out;
     }
 
-    friend bool operator<(const Position& l, const Position& r)
+    friend bool operator<(const Position& lhs, const Position& rhs)
     {
-        return std::tie(l.x_, l.y_) < std::tie(r.x_, r.y_); // keep the same order
+        return std::tie(lhs.x_, lhs.y_) < std::tie(rhs.x_, rhs.y_); // keep the same order
     }
 
     friend bool operator==(const Position& lhs, const Position& rhs) {
@@ -36,8 +31,8 @@ public:
     }
 
 private:
-    unsigned int x_;
-    unsigned int y_;
+    int x_;
+    int y_;
 };
 
 inline bool operator> (const Position& lhs, const Position& rhs) { return rhs < lhs; }
@@ -45,24 +40,64 @@ inline bool operator<=(const Position& lhs, const Position& rhs) { return !(lhs 
 inline bool operator>=(const Position& lhs, const Position& rhs) { return !(lhs < rhs); }
 inline bool operator!=(const Position& lhs, const Position& rhs) { return !(lhs == rhs); }
 
+class BoardPosition : public Position
+{
+public:
+    BoardPosition() : Position{ 1, 1 } {}
+    BoardPosition(const int x_value, const int y_value) { x(x_value); y(y_value); }
+    BoardPosition(const std::string& position) : Position{ x(position.substr(0, 1)), y(position.substr(1, 1)) } {}
+    ~BoardPosition() = default;
 
-class PawnPosition : public Position
+    const int x() const { return Position::x(); }
+    const int y() const { return Position::y(); }
+    const int x(const int x);
+    const int y(const int y);
+    const int x(const std::string & x);
+    const int y(const std::string & y);
+
+    void restore(const std::string&);
+
+    friend std::ostream& operator<<(std::ostream& out, const BoardPosition& position)
+    {
+        out << char('a' + position.x() - 1);
+        out << position.y();
+        return out;
+    }
+
+    friend bool operator<(const BoardPosition& lhs, const BoardPosition& rhs)
+    {
+        return (Position)lhs < (Position)rhs;
+    }
+
+    friend bool operator==(const BoardPosition& lhs, const BoardPosition& rhs) {
+        return (Position)lhs == (Position)rhs;
+    }
+
+private:
+};
+
+inline bool operator> (const BoardPosition& lhs, const BoardPosition& rhs) { return rhs < lhs; }
+inline bool operator<=(const BoardPosition& lhs, const BoardPosition& rhs) { return !(lhs > rhs); }
+inline bool operator>=(const BoardPosition& lhs, const BoardPosition& rhs) { return !(lhs < rhs); }
+inline bool operator!=(const BoardPosition& lhs, const BoardPosition& rhs) { return !(lhs == rhs); }
+
+class PawnPosition : public BoardPosition
 {
 public:
     PawnPosition() = default;
-    PawnPosition(const unsigned int x, const unsigned int y, const PlayerName& playerName) : Position(x, y), playerName_(playerName) {}
-    PawnPosition(const std::string & playerPosition, const PlayerName& playerName = "") : Position(playerPosition.substr(0, 2)), playerName_(playerName) {}
+    PawnPosition(const unsigned int x, const unsigned int y, const PlayerName& playerName) : BoardPosition{ x, y }, playerName_{ playerName } {}
+    PawnPosition(const std::string & playerPosition, const PlayerName& playerName = "") : BoardPosition(playerPosition.substr(0, 2)), playerName_(playerName) {}
     PawnPosition& operator=(const PawnPosition&) = default;
     ~PawnPosition() = default;
 
-	void playerName(const PlayerName& playerName) { playerName_ = playerName; }
-	const PlayerName& playerName() const { return playerName_; }
-	void restore(const std::string&);
+    void playerName(const PlayerName& playerName) { playerName_ = playerName; }
+    const PlayerName& playerName() const { return playerName_; }
+    void restore(const std::string&);
     void restore(const std::string&, const PlayerName&);
 
     friend std::ostream& operator<<(std::ostream& out, const PawnPosition& position)
     {
-        out << (Position)position;
+        out << (BoardPosition)position;
         if (!position.playerName_.empty())
             out << " (" << position.playerName_ << ") ";
         return out;
@@ -73,15 +108,15 @@ private:
 };
 
 
-class WallPosition : public Position
+class WallPosition : public BoardPosition
 {
 public:
     enum class Direction { horizontal, vertical };
 
     WallPosition() = default;
-    WallPosition(const unsigned int x, const unsigned int y, const Direction& direction) : Position(x, y), direction_(direction) {}
-    WallPosition(const unsigned int x, const unsigned int y, const std::string& text) : Position(x, y), direction_(direction(text)) {}
-    WallPosition(const std::string & wallPosition) : Position(wallPosition.substr(0, 2)), direction_(direction(wallPosition.substr(2, 1))) {}
+    WallPosition(const unsigned int x, const unsigned int y, const Direction& direction) : BoardPosition(x, y), direction_(direction) {}
+    WallPosition(const unsigned int x, const unsigned int y, const std::string& text) : BoardPosition(x, y), direction_(direction(text)) {}
+    WallPosition(const std::string & wallPosition) : BoardPosition(wallPosition.substr(0, 2)), direction_(direction(wallPosition.substr(2, 1))) {}
     WallPosition& operator=(const WallPosition&) = default;
     ~WallPosition() = default;
 
@@ -92,7 +127,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const WallPosition& position)
     {
-        out << (Position)position;
+        out << (BoardPosition)position;
         if (position.direction_ == WallPosition::Direction::horizontal)
             out << "h";
         if (position.direction_ == WallPosition::Direction::vertical)
@@ -117,8 +152,8 @@ public:
     const Type& type(const std::string &text);
     const Type& type() const { return type_; }
     void playerName(const PlayerName& playerName) { player_.playerName(playerName); }
-	const PawnPosition& pawn() const { return player_; }
-	const WallPosition& wall() const { return wall_; }
+    const PawnPosition& pawn() const { return player_; }
+    const WallPosition& wall() const { return wall_; }
 
     friend std::ostream& operator<<(std::ostream& out, const Move& move)
     {
