@@ -84,7 +84,7 @@ void Move::restore(const std::string & text)
     }
 }
 
-Move::Type Move::type(const std::string & text)
+const Move::Type& Move::type(const std::string & text)
 {
     if (text.size() == 2)
         type_ = Type::pawn;

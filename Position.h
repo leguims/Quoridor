@@ -55,8 +55,9 @@ public:
     PawnPosition& operator=(const PawnPosition&) = default;
     ~PawnPosition() = default;
 
-    void playerName(const PlayerName& playerName) { playerName_ = playerName; }
-    void restore(const std::string&);
+	void playerName(const PlayerName& playerName) { playerName_ = playerName; }
+	const PlayerName& playerName() const { return playerName_; }
+	void restore(const std::string&);
     void restore(const std::string&, const PlayerName&);
 
     friend std::ostream& operator<<(std::ostream& out, const PawnPosition& position)
@@ -113,19 +114,21 @@ public:
     Move(const std::string &text) : type_{ type(text) }, player_{ type_ == Type::pawn ? PawnPosition(text) : PawnPosition() }, wall_{ type_ == Type::wall ? WallPosition(text) : WallPosition() } {}
 
     void restore(const std::string &move);
-    Type type(const std::string &text);
-    Type type() const { return type_; }
+    const Type& type(const std::string &text);
+    const Type& type() const { return type_; }
     void playerName(const PlayerName& playerName) { player_.playerName(playerName); }
+	const PawnPosition& pawn() const { return player_; }
+	const WallPosition& wall() const { return wall_; }
 
     friend std::ostream& operator<<(std::ostream& out, const Move& move)
     {
         if (move.type_ == Type::pawn)
         {
-            out << (PawnPosition)move.player_;
+            out << move.player_;
         }
         else if (move.type_ == Type::wall)
         {
-            out << (WallPosition)move.wall_;
+            out << move.wall_;
         }
         return out;
     }

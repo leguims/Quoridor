@@ -13,8 +13,8 @@ public:
     void setBoard(const std::shared_ptr<Board> & board) { board_ = board; }
     ~Referee() = default;
 
-    bool Win(const Player & player) const;
-    bool ValidWall(const WallPosition &) const;
+	bool Win(const Player & player) const;
+	bool ValidWall(const WallPosition &) const;
     bool ValidPawn(const PawnPosition &) const;
     bool ValidMove(const Move &) const;
     std::vector<WallPosition>& getValidWalls() const;
@@ -36,5 +36,8 @@ private:
     bool ValidPawnRange(const PawnPosition &) const;
     bool ValidPawnFree(const PawnPosition &) const;
     bool ValidPawnLegalMove(const PawnPosition &) const;
+
+	//const std::vector<std::string> arrival_e1 = { "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9" };
+	//const std::vector<std::string> arrival_e9 = { "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1" };
 };
 

@@ -46,6 +46,7 @@ public:
     void move();
     //void save();
     Result getResult() const;
+	const Referee& referee() const { return referee_; }
 
     friend std::ostream& operator<<(std::ostream& out, const Game& game)
     {
@@ -66,8 +67,10 @@ public:
 
         out << "Result : " << game.getResult() << std::endl;
 
-        out << "Game moves : " << std::endl;
-        index = 1;
+		// out << "Notation : Glendenning/Alternative" << std::endl;
+
+		out << "Game moves : " << std::endl;
+		index = 1;
         for (const auto &move : game.moveList_)
         {
             out << index++ << "." << move.first << "\t" << move.second << std::endl;
@@ -85,6 +88,5 @@ private:
 
     bool inGame;
     int index_player_;
-    int round_;
 };
 

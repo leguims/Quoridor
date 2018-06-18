@@ -28,7 +28,8 @@ int main()
     }
 
 
-    Game game;
+	std::cout << std::endl << std::endl;
+	Game game;
 
     game.chooseReferee();
     game.choosePlayers();
@@ -41,11 +42,13 @@ int main()
     game.move();    game.move();
     game.move();    game.move();
     game.move();    game.move();
-    game.move();    game.move();
-    game.move();    game.move();
+	game.move();    game.move();
+	game.move();    game.move();
+	game.move();    game.move();
+	game.move();    game.move();
 
     game.move();    game.move();
-    game.move();    game.move();
+	game.move();    game.move();
 
     //game.save();
     std::cout << game;

@@ -2,11 +2,25 @@
 
 bool Referee::Win(const Player & player) const
 {
-    // TO DO
-    // TO DO
-    // TO DO
-    //if(player.startPosition() == Position("e1"))
-    return true;
+	if (player.startPosition() == Position("e1"))
+	{
+		auto pl = board_->position(player.name());
+		for (const auto &arrival : { "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9", })
+		{
+			if (pl == std::string(arrival))
+				return true;
+		}
+	}
+	else if (player.startPosition() == Position("e9"))
+	{
+		auto pl = board_->position(player.name());
+		for (const auto &arrival : { "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1", })
+		{
+			if (pl == std::string(arrival))
+				return true;
+		}
+	}
+    return false;
 }
 
 bool Referee::ValidWall(const WallPosition &) const
@@ -34,9 +48,17 @@ bool Referee::ValidPawn(const PawnPosition &) const
     return true;
 }
 
-bool Referee::ValidMove(const Move &)const
+bool Referee::ValidMove(const Move &move)const
 {
-    // Check type of move
+	if (move.type() == Move::Type::pawn)
+		ValidPawn(move.pawn());
+	else if (move.type() == Move::Type::wall)
+		ValidWall(move.wall());
+	else if (move.type() == Move::Type::none)
+		return false;
+	else
+		throw std::out_of_range("Unknown move to verify");
+	// Check type of move
     // Check wall move
     // Check pawn move
 

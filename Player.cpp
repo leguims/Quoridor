@@ -20,7 +20,9 @@ Move Player::getNextMove(const unsigned int &round, const Board &board) const
         "e6", "d4", 
         "c3h", "a3h", 
         "e7", "e7h", 
-        "d6v", "d4v" 
+        "d6v", "d4v",
+		"e8", "d3",
+		"e9", "d2"
     };
     if ( (2*round) > move_list.size())
         return Move();
