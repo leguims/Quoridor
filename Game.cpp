@@ -5,69 +5,74 @@
 
 void Game::chooseReferee()
 {
-	// choose referee, means rules.
-	// referee_.set(...)
-	referee_.setBoard(board_);
+    // choose referee, means rules.
+    // referee_.set(...)
+    referee_.setBoard(board_);
 }
 
 void Game::choosePlayers()
 {
-	// Ask user to choose players : human, IA ?
-	players_.emplace_back("Player 1", Player::Color::black, BoardPosition("e1"));
-	players_.emplace_back("Player 2", Player::Color::red, BoardPosition("e9"));
+    // Ask user to choose players : human, IA ?
+    players_.emplace_back("Player 1", Player::Color::black, BoardPosition("e1"));
+    players_.emplace_back("Player 2", Player::Color::red, BoardPosition("e9"));
 }
 
 void Game::launch()
 {
-	inGame = true;
+    for (const auto& p : players_)
+    {
+        Move move = PawnPosition(p.startPosition(), p.name() );
+        board_->add(move);
+    }
+    inGame = true;
 }
 
 void Game::move()
 {
-	if (!inGame)
-		return;
+    if (!inGame)
+        return;
 
-	// change player
-	index_player_ = ++index_player_ % players_.size();
-	auto round = (index_player_==0?moveList_.size()+1:moveList_.size());
-	//std::cout << "Round = " << round << std::endl;
+    // change player
+    index_player_ = ++index_player_ % players_.size();
+    auto round = (index_player_ == 0 ? moveList_.size() + 1 : moveList_.size());
+    //std::cout << "Round = " << round << std::endl;
 
-	auto& current_player = players_.at(index_player_);
-	auto move = current_player.getNextMove(round, *board_);
-	if (referee_.ValidMove(move))
-	{
-		if (index_player_ == 0)
-		{
-			// Save player 1 (and "none" for player 2)
-			moveList_.emplace_back(std::make_pair(move, Move()));
-		}
-		else if (index_player_ == 1)
-		{
-			// Save player 2
-			moveList_.at(round - 1).second = move;
-		}
-		else
-		{
-			throw std::out_of_range("Unexpected player " + index_player_);
-		}
+    auto& current_player = players_.at(index_player_);
+    auto move = current_player.getNextMove(round, *board_);
+    move.playerName(current_player.name());
+    if (referee_.ValidMove(move))
+    {
+        if (index_player_ == 0)
+        {
+            // Save player 1 (and "none" for player 2)
+            moveList_.emplace_back(std::make_pair(move, Move()));
+        }
+        else if (index_player_ == 1)
+        {
+            // Save player 2
+            moveList_.at(round - 1).second = move;
+        }
+        else
+        {
+            throw std::out_of_range("Unexpected player " + index_player_);
+        }
 
-		// Add move to the board
-		move.playerName(current_player.name());
-		board_->add(move);
+        // Add move to the board
+        board_->add(move);
 
-		// Remove a wall to player
-		if (move.type() == Move::Type::wall)
-			current_player.removeWall();
+        // Remove a wall to player
+        if (move.type() == Move::Type::wall)
+            current_player.removeWall();
 
-		// Check if game is over
-		if (referee_.Win(current_player))
-			inGame = false;
-	}
-	else
-	{
-		std::cout << "Round " << moveList_.size() << " : " << current_player.name() << " : Invalid move, game is over." << std::endl;
-		inGame = false;
-	}
+        // Check if game is over
+        if (referee_.Win(current_player))
+            inGame = false;
+    }
+    else
+    {
+        std::cout << "Round " << moveList_.size() << " : " << current_player.name() << " : Invalid move, game is over." << std::endl;
+        inGame = false;
+    }
 }
 
 //void Game::save()
@@ -84,12 +89,12 @@ void Game::move()
 
 Game::Result Game::getResult() const
 {
-	if (inGame)
-		return Game::Result::inProgress;
-	else if (referee_.Win(players_[0]))
-		return Game::Result::win1;
-	else if (referee_.Win(players_[1]))
-		return Game::Result::win2;
-	else
-		return Game::Result::draw;
+    if (inGame)
+        return Game::Result::inProgress;
+    else if (referee_.Win(players_[0]))
+        return Game::Result::win1;
+    else if (referee_.Win(players_[1]))
+        return Game::Result::win2;
+    else
+        return Game::Result::draw;
 }

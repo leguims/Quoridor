@@ -1,5 +1,5 @@
 #include "Board.h"
-
+#include <algorithm>
 
 Board::Board() : width_{ 0 }, heigth_{ 0 }
 {
@@ -12,16 +12,19 @@ Board::~Board()
 void Board::add(const PawnPosition & pawn)
 {
 	// Find player on board
-	auto player = playersPosition_.find(pawn.playerName());
-	if (player == playersPosition_.end())
+    auto name = pawn.playerName();
+    auto player = std::find_if(pawnsPosition_.begin(), pawnsPosition_.end(), 
+        [name] (const PawnPosition &p)->bool { return (p.playerName() == name); });
+
+    if (player == pawnsPosition_.end())
 	{
 		// New pawn : Add it
-		playersPosition_.emplace(pawn.playerName(), pawn);
+        pawnsPosition_.emplace_back(pawn);
 	}
 	else
 	{
 		// Existing one : replace it
-		player->second = pawn;
+		*player = pawn;
 	}
 }
 
@@ -42,11 +45,23 @@ void Board::add(const Move & move)
 		throw std::out_of_range("Unknown move to add to the board");
 }
 
-PawnPosition & Board::position(const PlayerName & name)
+const PawnPosition & Board::position(const PlayerName & name)
 {
-	auto player = playersPosition_.find(name);
-	if(player == playersPosition_.end())
+    // Find player by name in vector
+    auto player = std::find_if(pawnsPosition_.begin(), pawnsPosition_.end(),
+        [name](const PawnPosition &p)->bool { return (p.playerName() == name); });
+
+	if(player == pawnsPosition_.end())
 		throw std::out_of_range("Player " + name + " unknown");
 	
-	return player->second;
+	return *player;
 }
+
+bool Board::exists(const WallPosition & wall)
+{
+    // Find player by name in vector
+    auto wallFound = std::find(wallsPosition_.begin(), wallsPosition_.end(), wall);
+
+    return (wallFound != wallsPosition_.end());
+}
+

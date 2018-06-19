@@ -13,19 +13,23 @@ public:
 
     void add(const Move & move);
 
-	PawnPosition& position(const PlayerName& name);
+    const PawnPosition& position(const PlayerName& name);
+    const std::vector<PawnPosition>& pawns() { return pawnsPosition_; }
+    const std::vector<WallPosition>& walls() { return wallsPosition_; }
+    bool exists(const WallPosition& wall);
+
 
     // To remove ?
-    //std::vector<PawnPosition>& playersPosition() { return playersPosition_; }
-    std::vector<WallPosition>& wallsPosition() { return wallsPosition_; }
+    //const std::vector<PawnPosition>& playersPosition() { return pawnsPosition_; }
+    //std::vector<WallPosition>& wallsPosition() { return wallsPosition_; }
 
 private:
     unsigned int width_;
     unsigned int heigth_;
-    std::map<std::string, PawnPosition> playersPosition_;
+    std::vector<PawnPosition> pawnsPosition_;
     std::vector<WallPosition> wallsPosition_;
 
-	void add(const PawnPosition & pawn);
-	void add(const WallPosition & wall);
+    void add(const PawnPosition & pawn);
+    void add(const WallPosition & wall);
 };
 
