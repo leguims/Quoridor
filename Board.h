@@ -17,10 +17,11 @@ public:
     void add(const Move & move);
     void registerHandler(const handlerCB &&);
 
-    const PawnPosition& position(const PlayerName& name) const;
+    const PawnPosition& getPawn(const PlayerName& name) const;
     const std::vector<PawnPosition>& pawns() const { return pawnsPosition_; }
     const std::vector<WallPosition>& walls() const { return wallsPosition_; }
-    bool exists(const WallPosition& wall) const;
+    bool existsWall(const WallPosition& wall) const;
+    bool existsPawn(const Position& pawnPos) const;
 
 
     // To remove ?
@@ -37,5 +38,6 @@ private:
     void add(const PawnPosition & pawn);
     void add(const WallPosition & wall);
     void callHandlers();
+    PawnPosition& getPawn_(const PlayerName& name);
 };
 

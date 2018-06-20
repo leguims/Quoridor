@@ -212,6 +212,10 @@ public:
         return out;
     }
 
+    friend bool operator==(const WallPosition& lhs, const WallPosition& rhs) {
+        return ((Position)lhs == (Position)rhs) && (lhs.direction_ == rhs.direction_);
+    }
+
     WallPosition& operator+=(WallPosition rhs)
     {
         (Position)rhs += (Position)*this;
@@ -263,6 +267,8 @@ private:
     bool validX(const int x);
     bool validY(const int y);
 };
+
+inline bool operator!=(const WallPosition& lhs, const WallPosition& rhs) { return !(lhs == rhs); }
 
 class Move
 {

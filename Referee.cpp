@@ -3,7 +3,7 @@
 void Referee::setBoard(const std::shared_ptr<Board>& board)
 {
     board_ = board;
-    board_->registerHandler([this](){
+    board_->registerHandler([this]() {
         // Action to do when board is changing
         validPawns_.clear();
         validwalls_.clear();
@@ -11,11 +11,26 @@ void Referee::setBoard(const std::shared_ptr<Board>& board)
     });
 }
 
+void Referee::reset(const std::vector<Player>& players)
+{
+    // Initialize start position for players
+    for (const auto& p : players)
+    {
+        Move move = PawnPosition(p.startPosition(), p.name());
+        board_->add(move);
+    }
+
+    // Action to do when board is changing
+    validPawns_.clear();
+    validwalls_.clear();
+    validMoves_.clear();
+}
+
 bool Referee::Win(const Player & player) const
 {
     if (player.startPosition() == BoardPosition("e1"))
     {
-        auto pl = board_->position(player.name());
+        auto pl = board_->getPawn(player.name());
         const auto& arrival_e1 = { "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9", };
         for (const auto &arrival : arrival_e1)
         {
@@ -25,7 +40,7 @@ bool Referee::Win(const Player & player) const
     }
     else if (player.startPosition() == BoardPosition("e9"))
     {
-        auto pl = board_->position(player.name());
+        auto pl = board_->getPawn(player.name());
         const auto& arrival_e9 = { "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1" };
         for (const auto &arrival : arrival_e9)
         {
@@ -52,94 +67,127 @@ bool Referee::ValidWall(const WallPosition &) const
 bool Referee::ValidPawn(const PawnPosition &pawn) const
 {
     auto name = pawn.playerName();
-    auto currentPawn = board_->position(name);
+    auto currentPawn = board_->getPawn(name);
 
     // Check range of pawns ==> Already done in 'PawnPosition'
 
+
     // Check if a pawn is already in this position
-    auto pawns = board_->pawns();
-    for (const auto & p : pawns)
-    {
-        if (p == pawn)
-            return false;
-    }
+    if (board_->existsPawn(pawn))
+        return false;
+
 
     // Check if pawns is a legal move
-    auto d = pawn.distance(currentPawn);
+    auto d = currentPawn.distance(pawn);
     auto length = d.length();
-
     if (length == 1)
     {
         // (next to player pawns and no wall between 2 positions)
-        // Pawn moves to next case
-
         // Verify the pawn moves to next square
         if ((d == Position(1, 0)) || (d == Position(-1, 0))
             || (d == Position(0, 1)) || (d == Position(0, -1)))
         {
-            for (const auto& wall : findBlockerWalls(currentPawn, pawn))
-            {
-                if (board_->exists(wall))
-                    return false;
-            }
-            return true;
+            // Verify no wall block the move
+            if (noBlockerWalls(currentPawn, pawn))
+                return true;
         }
         else
         {
             // Pawn jumps over another pawn, but bounces on wall behind it.
-            if ((d == Position(1, 1)))
-            {
-                // TO DO
-                // TO DO
-            }
-            else if ((d == Position(1, -1)))
-            {
-                // TO DO
-                // TO DO
-            }
-            else if ((d == Position(-1, -1)))
-            {
-                // TO DO
-                // TO DO
-            }
-            else if ((d == Position(-1, 1)))
-            {
-                // TO DO
-                // TO DO
-            }
+            std::vector<std::tuple<Position, Position, WallPosition, WallPosition>> tests = {
+                //{
+                //    distance,
+                //    opponent,
+                //    wall1,
+                //    wall2
+                //},
+                {
+                    Position(1, 1) ,
+                    (Position)currentPawn + Position(0, -1) ,
+                    WallPosition(currentPawn.x(), currentPawn.y() - 2, WallPosition::Direction::horizontal) ,
+                    WallPosition(currentPawn.x() - 1, currentPawn.y() - 2, WallPosition::Direction::horizontal)
+                },
+                {
+                    Position(1, 1) ,
+                    (Position)currentPawn + Position(-1, 0) ,
+                    WallPosition(currentPawn.x() - 2, currentPawn.y(), WallPosition::Direction::vertical) ,
+                    WallPosition(currentPawn.x() - 2, currentPawn.y() - 1, WallPosition::Direction::vertical)
+                },
+                {
+                    Position(1, -1) ,
+                    (Position)currentPawn + Position(-1, 0) ,
+                    WallPosition(currentPawn.x() - 2, currentPawn.y(), WallPosition::Direction::vertical) ,
+                    WallPosition(currentPawn.x() - 2, currentPawn.y() - 1, WallPosition::Direction::vertical)
+                },
+                {
+                    Position(1, -1) ,
+                    (Position)currentPawn + Position(0, 1) ,
+                    WallPosition(currentPawn.x(), currentPawn.y() + 1, WallPosition::Direction::horizontal) ,
+                    WallPosition(currentPawn.x() - 1, currentPawn.y() + 1, WallPosition::Direction::horizontal)
+                },
+                {
+                    Position(-1, -1) ,
+                    (Position)currentPawn + Position(0, 1) ,
+                    WallPosition(currentPawn.x(), currentPawn.y() + 1, WallPosition::Direction::horizontal) ,
+                    WallPosition(currentPawn.x() - 1, currentPawn.y() + 1, WallPosition::Direction::horizontal)
+                },
+                {
+                    Position(-1, -1) ,
+                    (Position)currentPawn + Position(1, 0) ,
+                    WallPosition(currentPawn.x() + 1, currentPawn.y() , WallPosition::Direction::vertical) ,
+                    WallPosition(currentPawn.x() + 1, currentPawn.y() - 1 , WallPosition::Direction::vertical)
+                },
+                {
+                    Position(-1, 1) ,
+                    (Position)currentPawn + Position(1, 0) ,
+                    WallPosition(currentPawn.x() + 1, currentPawn.y() , WallPosition::Direction::vertical) ,
+                    WallPosition(currentPawn.x() + 1, currentPawn.y() - 1 , WallPosition::Direction::vertical)
+                },
+                {
+                    Position(-1, 1) ,
+                    (Position)currentPawn + Position(0, -1) ,
+                    WallPosition(currentPawn.x(), currentPawn.y() - 2, WallPosition::Direction::horizontal) ,
+                    WallPosition(currentPawn.x() - 1, currentPawn.y() - 2, WallPosition::Direction::horizontal)
+                },
+            };
 
-            // TO DO
-            // TO DO
-            // TO DO
-            // TO DO
-            // TO DO
-            // TO DO
-            // TO DO
+            Position distance;
+            Position opponent;
+            WallPosition wall1;
+            WallPosition wall2;
+            for (const auto & t : tests)
+            {
+                std::tie(distance, opponent, wall1, wall2) = t;
+                if (d == distance)
+                {
+                    // Opponent at the right place + 1 Wall behind opponent + NO wall between opponent and destination
+                    if (board_->existsPawn(opponent)
+                        && (board_->existsWall(wall1) || board_->existsWall(wall2))
+                        && noBlockerWalls(opponent, pawn))
+                    {
+                        return true;
+                    }
+                }
+            }
         }
     }
     else if (length == 2)
     {
         // Pawn jumps over another pawn
-        // Where have to be the other pawn
-        auto opponent = ((Position)pawn + (Position)currentPawn) / 2;
+        // Define where have to be the other pawn
+        auto pawnJumped = ((Position)pawn + (Position)currentPawn) / 2;
 
-        // Verify that opponent is in the right position
-        for (const auto& p : board_->pawns())
-        {
-            if (((Position)p != (Position)currentPawn) && ((Position)p != opponent))
-                return false;
-        }
+        // Verify that pawnJumped exists on board
+        if (!board_->existsPawn(pawnJumped))
+            return false;
 
         // Verify that pawn moves 2 squares ahead
         if ((d == Position(2, 0)) || (d == Position(-2, 0))
             || (d == Position(0, 2)) || (d == Position(0, -2)))
         {
-            for (const auto& wall : findBlockerWalls(currentPawn, pawn))
-            {
-                if (board_->exists(wall))
-                    return false;
-            }
-            return true;
+            // Verify that no wall can block the jump
+            if (noBlockerWalls(currentPawn, pawn))
+                return true;
         }
     }
 
@@ -221,7 +269,7 @@ const std::vector<Move>& Referee::getValidMoves()
     return validMoves_;
 }
 
-std::vector<WallPosition> Referee::findBlockerWalls(const PawnPosition &current, const PawnPosition &next) const
+std::vector<WallPosition> Referee::findBlockerWalls(const BoardPosition &current, const BoardPosition &next) const
 {
     std::vector<WallPosition> list;
 
@@ -246,7 +294,7 @@ std::vector<WallPosition> Referee::findBlockerWalls(const PawnPosition &current,
     }
     else if (length > 1)
     {
-        // middle position
+        // middle pawn position
         auto middle = PawnPosition(((Position)current + (Position)next) / 2, "");
 
         for (const auto& wall : findBlockerWalls(current, middle))
@@ -258,9 +306,19 @@ std::vector<WallPosition> Referee::findBlockerWalls(const PawnPosition &current,
     else
     {
         std::ostringstream oss;
-        oss << "Move between " << current << " and " << next << " must be as a line.";
+        oss << "Move between " << current << " and " << next << " must be vertical/horizontal line.";
         throw std::out_of_range(oss.str());
     }
 
     return list;
+}
+
+bool Referee::noBlockerWalls(const BoardPosition &p1, const BoardPosition &p2) const
+{
+    for (const auto& wall : findBlockerWalls(p1, p2))
+    {
+        if (board_->existsWall(wall))
+            return false;
+    }
+    return true;
 }

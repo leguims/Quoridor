@@ -19,11 +19,7 @@ void Game::choosePlayers()
 
 void Game::launch()
 {
-    for (const auto& p : players_)
-    {
-        Move move = PawnPosition(p.startPosition(), p.name() );
-        board_->add(move);
-    }
+    referee_.reset(players_);
     inGame = true;
 }
 

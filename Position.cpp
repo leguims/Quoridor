@@ -52,28 +52,28 @@ WallPosition::WallPosition(const BoardPosition & a, const BoardPosition & b)
     auto d = a.distance(b);
     if (d == Position(1, 0))
     {
-        // b is the wall position
+        // b is the wall getPawn
         x(b.x());
         y(b.y());
         direction(Direction::vertical);
     }
     else if (d == Position(-1, 0))
     {
-        // a is the wall position
+        // a is the wall getPawn
         x(a.x());
         y(a.y());
         direction(Direction::vertical);
     }
     else if (d == Position(0, 1))
     {
-        // b is the wall position
+        // b is the wall getPawn
         x(b.x());
         y(b.y());
         direction(Direction::horizontal);
     }
     else if (d == Position(0, -1))
     {
-        // a is the wall position
+        // a is the wall getPawn
         x(a.x());
         y(a.y());
         direction(Direction::horizontal);

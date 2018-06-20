@@ -82,7 +82,6 @@ public:
 private:
     Referee referee_;
     std::shared_ptr<Board> board_;
-    //Board board_;
     std::vector<Player> players_;
     std::vector<std::pair<Move, Move>> moveList_;
 
