@@ -8,7 +8,7 @@ Player::Player(const PlayerName & name, const Color & color, const BoardPosition
 {
 }
 
-Move Player::getNextMove(const unsigned int &round, const Board &board) const
+Move Player::getNextMove(const unsigned int &round, const Board &board, const std::vector<PawnPosition>& pawns, const std::vector<WallPosition>& walls) const
 {
     // https://quoridorstrats.files.wordpress.com/2014/09/game-full-with-notation1.png
     // Only legal moves.

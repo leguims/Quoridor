@@ -88,6 +88,8 @@ public:
     const int y(const int y);
     const int x(const std::string & x);
     const int y(const std::string & y);
+    void position(const int x_value, const int y_value) { x(x_value); y(y_value); }
+    Position position() { return (Position)*this; }
 
     void restore(const std::string&);
 

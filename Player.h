@@ -17,9 +17,10 @@ public:
     Player(const PlayerName &name, const Color &color, const BoardPosition &startPosition);
     Player& operator=(const Player&) = default;
     ~Player() = default;
-    Move getNextMove(const unsigned int &round, const Board &board) const ;
     const PlayerName& name() const { return name_; }
     const BoardPosition& startPosition() const { return startPosition_; }
+
+    Move getNextMove(const unsigned int &round, const Board &board, const std::vector<PawnPosition>& pawns, const std::vector<WallPosition>& walls) const ;
     bool haveWall() { return (walls_ > 0); }
     void removeWall() { --walls_; }
 

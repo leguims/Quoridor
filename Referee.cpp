@@ -93,76 +93,156 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
         }
         else
         {
+            //try
+            //{
             // Pawn jumps over another pawn, but bounces on wall behind it.
-            std::vector<std::tuple<Position, Position, WallPosition, WallPosition>> tests = {
-                //{
-                //    distance,
-                //    opponent,
-                //    wall1,
-                //    wall2
-                //},
-                {
-                    Position(1, 1) ,
-                    (Position)currentPawn + Position(0, -1) ,
-                    WallPosition(currentPawn.x(), currentPawn.y() - 2, WallPosition::Direction::horizontal) ,
+            std::vector<std::tuple<Position, Position, WallPosition>> tests;
+            //std::vector<     distance    , opponent,     wall    >> tests;
+            //{
+            //    distance,
+            //    opponent,
+            //    wall,
+            //},
+            try {
+                tests.emplace_back(
+                    Position(1, 1),
+                    (Position)currentPawn + Position(0, -1),
+                    WallPosition(currentPawn.x(), currentPawn.y() - 2, WallPosition::Direction::horizontal)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(1, 1),
+                    (Position)currentPawn + Position(0, -1),
                     WallPosition(currentPawn.x() - 1, currentPawn.y() - 2, WallPosition::Direction::horizontal)
-                },
-                {
-                    Position(1, 1) ,
-                    (Position)currentPawn + Position(-1, 0) ,
-                    WallPosition(currentPawn.x() - 2, currentPawn.y(), WallPosition::Direction::vertical) ,
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(1, 1),
+                    (Position)currentPawn + Position(-1, 0),
+                    WallPosition(currentPawn.x() - 2, currentPawn.y(), WallPosition::Direction::vertical)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(1, 1),
+                    (Position)currentPawn + Position(-1, 0),
                     WallPosition(currentPawn.x() - 2, currentPawn.y() - 1, WallPosition::Direction::vertical)
-                },
-                {
-                    Position(1, -1) ,
-                    (Position)currentPawn + Position(-1, 0) ,
-                    WallPosition(currentPawn.x() - 2, currentPawn.y(), WallPosition::Direction::vertical) ,
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(1, -1),
+                    (Position)currentPawn + Position(-1, 0),
+                    WallPosition(currentPawn.x() - 2, currentPawn.y(), WallPosition::Direction::vertical)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(1, -1),
+                    (Position)currentPawn + Position(-1, 0),
                     WallPosition(currentPawn.x() - 2, currentPawn.y() - 1, WallPosition::Direction::vertical)
-                },
-                {
-                    Position(1, -1) ,
-                    (Position)currentPawn + Position(0, 1) ,
-                    WallPosition(currentPawn.x(), currentPawn.y() + 1, WallPosition::Direction::horizontal) ,
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(1, -1),
+                    (Position)currentPawn + Position(0, 1),
+                    WallPosition(currentPawn.x(), currentPawn.y() + 1, WallPosition::Direction::horizontal)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(1, -1),
+                    (Position)currentPawn + Position(0, 1),
                     WallPosition(currentPawn.x() - 1, currentPawn.y() + 1, WallPosition::Direction::horizontal)
-                },
-                {
-                    Position(-1, -1) ,
-                    (Position)currentPawn + Position(0, 1) ,
-                    WallPosition(currentPawn.x(), currentPawn.y() + 1, WallPosition::Direction::horizontal) ,
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(-1, -1),
+                    (Position)currentPawn + Position(0, 1),
+                    WallPosition(currentPawn.x(), currentPawn.y() + 1, WallPosition::Direction::horizontal)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(-1, -1),
+                    (Position)currentPawn + Position(0, 1),
                     WallPosition(currentPawn.x() - 1, currentPawn.y() + 1, WallPosition::Direction::horizontal)
-                },
-                {
-                    Position(-1, -1) ,
-                    (Position)currentPawn + Position(1, 0) ,
-                    WallPosition(currentPawn.x() + 1, currentPawn.y() , WallPosition::Direction::vertical) ,
-                    WallPosition(currentPawn.x() + 1, currentPawn.y() - 1 , WallPosition::Direction::vertical)
-                },
-                {
-                    Position(-1, 1) ,
-                    (Position)currentPawn + Position(1, 0) ,
-                    WallPosition(currentPawn.x() + 1, currentPawn.y() , WallPosition::Direction::vertical) ,
-                    WallPosition(currentPawn.x() + 1, currentPawn.y() - 1 , WallPosition::Direction::vertical)
-                },
-                {
-                    Position(-1, 1) ,
-                    (Position)currentPawn + Position(0, -1) ,
-                    WallPosition(currentPawn.x(), currentPawn.y() - 2, WallPosition::Direction::horizontal) ,
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(-1, -1),
+                    (Position)currentPawn + Position(1, 0),
+                    WallPosition(currentPawn.x() + 1, currentPawn.y(), WallPosition::Direction::vertical)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(-1, -1),
+                    (Position)currentPawn + Position(1, 0),
+                    WallPosition(currentPawn.x() + 1, currentPawn.y() - 1, WallPosition::Direction::vertical)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(-1, 1),
+                    (Position)currentPawn + Position(1, 0),
+                    WallPosition(currentPawn.x() + 1, currentPawn.y(), WallPosition::Direction::vertical)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(-1, 1),
+                    (Position)currentPawn + Position(1, 0),
+                    WallPosition(currentPawn.x() + 1, currentPawn.y() - 1, WallPosition::Direction::vertical)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(-1, 1),
+                    (Position)currentPawn + Position(0, -1),
+                    WallPosition(currentPawn.x(), currentPawn.y() - 2, WallPosition::Direction::horizontal)
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            try {
+                tests.emplace_back(
+                    Position(-1, 1),
+                    (Position)currentPawn + Position(0, -1),
                     WallPosition(currentPawn.x() - 1, currentPawn.y() - 2, WallPosition::Direction::horizontal)
-                },
-            };
+                );
+            }
+            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
 
             Position distance;
             Position opponent;
-            WallPosition wall1;
-            WallPosition wall2;
+            WallPosition wall;
             for (const auto & t : tests)
             {
-                std::tie(distance, opponent, wall1, wall2) = t;
+                std::tie(distance, opponent, wall) = t;
                 if (d == distance)
                 {
                     // Opponent at the right place + 1 Wall behind opponent + NO wall between opponent and destination
                     if (board_->existsPawn(opponent)
-                        && (board_->existsWall(wall1) || board_->existsWall(wall2))
+                        && board_->existsWall(wall)
                         && noBlockerWalls(opponent, pawn))
                     {
                         return true;
@@ -232,38 +312,35 @@ const std::vector<WallPosition>& Referee::getValidWalls()
     return validwalls_;
 }
 
-const std::vector<PawnPosition>& Referee::getValidPawns()
+const std::vector<PawnPosition>& Referee::getValidPawns(const PlayerName & player)
 {
     if (validPawns_.empty())
     {
+        PawnPosition pawn{ 1, 1, player };
         // For each theorical pawns, check validity
-        // Then add it to pawn list
-
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
+        for (const auto& x : { 1,2,3,4,5,6,7,8,9 })
+        {
+            for (const auto& y : { 1,2,3,4,5,6,7,8,9 })
+            {
+                pawn.position(x, y);
+                // Then add it to pawn list
+                if (ValidPawn(pawn))
+                    validPawns_.push_back(pawn);
+            }
+        }
     }
 
     return validPawns_;
 }
 
-const std::vector<Move>& Referee::getValidMoves()
+const std::vector<Move>& Referee::getValidMoves(const PlayerName & player)
 {
     if (validMoves_.empty())
     {
         for (const auto & w : getValidWalls())
             validMoves_.emplace_back(w);
 
-        for (const auto & p : getValidPawns())
+        for (const auto & p : getValidPawns(player))
             validMoves_.emplace_back(p);
     }
     return validMoves_;
@@ -282,15 +359,29 @@ std::vector<WallPosition> Referee::findBlockerWalls(const BoardPosition &current
     {
         // Pawn moves to next case
         // Find each possible walls between the 2 pawns
-        auto wall1 = WallPosition(next, current);
-        auto wall2 = wall1;
-        if (wall1.direction() == WallPosition::Direction::horizontal)
-            wall2 += Position(-1, 0);
-        else if (wall1.direction() == WallPosition::Direction::vertical)
-            wall2 += Position(0, -1);
+        auto wall1 = WallPosition{};
+        try
+        {
+            wall1 = WallPosition(next, current);
+            list.emplace_back(wall1);
 
-        list.emplace_back(wall1);
-        list.emplace_back(wall2);
+            try
+            {
+                auto wall2 = wall1;
+                if (wall1.direction() == WallPosition::Direction::horizontal)
+                    wall2 += Position(-1, 0);
+                else if (wall1.direction() == WallPosition::Direction::vertical)
+                    wall2 += Position(0, -1);
+
+                list.emplace_back(wall2);
+            }
+            catch (const std::out_of_range &) {} // Wall2 is out of board : ignore it
+        }
+        catch (const std::out_of_range &)
+        {
+            // wall1 created is out of board, so return "wall2" instead.
+            list.emplace_back(wall1);
+        }
     }
     else if (length > 1)
     {

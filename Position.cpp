@@ -52,31 +52,75 @@ WallPosition::WallPosition(const BoardPosition & a, const BoardPosition & b)
     auto d = a.distance(b);
     if (d == Position(1, 0))
     {
-        // b is the wall getPawn
-        x(b.x());
-        y(b.y());
-        direction(Direction::vertical);
+        try
+        {
+            // b is the wall position
+            x(b.x());
+            y(b.y());
+            direction(Direction::vertical);
+        }
+        catch (const std::out_of_range &)
+        {
+            // b is illegal wall position => take b + (0, -1)
+            x(b.x());
+            y(b.y() - 1);
+            direction(Direction::vertical);
+            throw;
+        }
     }
     else if (d == Position(-1, 0))
     {
-        // a is the wall getPawn
-        x(a.x());
-        y(a.y());
-        direction(Direction::vertical);
+        try
+        {
+            // a is the wall position
+            x(a.x());
+            y(a.y());
+            direction(Direction::vertical);
+        }
+        catch (const std::out_of_range &)
+        {
+            // a is illegal wall position => take b + (0, -1)
+            x(a.x());
+            y(a.y()-1);
+            direction(Direction::vertical);
+            throw;
+        }
     }
     else if (d == Position(0, 1))
     {
-        // b is the wall getPawn
-        x(b.x());
-        y(b.y());
-        direction(Direction::horizontal);
+        try
+        {
+            // b is the wall position
+            x(b.x());
+            y(b.y());
+            direction(Direction::horizontal);
+        }
+        catch (const std::out_of_range &)
+        {
+            // b is illegal wall position => take b + (0, -1)
+            x(b.x());
+            y(b.y() - 1);
+            direction(Direction::horizontal);
+            throw;
+        }
     }
     else if (d == Position(0, -1))
     {
-        // a is the wall getPawn
-        x(a.x());
-        y(a.y());
-        direction(Direction::horizontal);
+        try
+        {
+            // a is the wall position
+            x(a.x());
+            y(a.y());
+            direction(Direction::horizontal);
+        }
+        catch (const std::out_of_range &)
+        {
+            // a is illegal wall position => take b + (0, -1)
+            x(a.x());
+            y(a.y() - 1);
+            direction(Direction::horizontal);
+            throw;
+        }
     }
     else
     {

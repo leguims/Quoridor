@@ -18,8 +18,8 @@ public:
     bool ValidPawn(const PawnPosition &) const;
     bool ValidMove(const Move &) const;
     const std::vector<WallPosition>& getValidWalls();
-    const std::vector<PawnPosition>& getValidPawns();
-    const std::vector<Move>& getValidMoves();
+    const std::vector<PawnPosition>& getValidPawns(const PlayerName & player);
+    const std::vector<Move>& getValidMoves(const PlayerName & player);
 
     friend std::ostream& operator<<(std::ostream& out, const Referee& referee)
     {
