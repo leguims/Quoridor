@@ -10,16 +10,16 @@ class Referee
 public:
     Referee() = default;
     //Referee(const std::shared_ptr<Board> & board);
-    void setBoard(const std::shared_ptr<Board> & board) { board_ = board; }
+    void setBoard(const std::shared_ptr<Board> & board);
     ~Referee() = default;
 
 	bool Win(const Player & player) const;
 	bool ValidWall(const WallPosition &) const;
     bool ValidPawn(const PawnPosition &) const;
     bool ValidMove(const Move &) const;
-    std::vector<WallPosition>& getValidWalls() const;
-    std::vector<PawnPosition>& getValidPawns() const;
-    std::vector<Move>& getValidMoves() const;
+    const std::vector<WallPosition>& getValidWalls();
+    const std::vector<PawnPosition>& getValidPawns();
+    const std::vector<Move>& getValidMoves();
 
     friend std::ostream& operator<<(std::ostream& out, const Referee& referee)
     {
@@ -29,6 +29,10 @@ public:
 
 private:
     std::shared_ptr<Board> board_;
+    std::vector<PawnPosition> validPawns_;
+    std::vector<WallPosition> validwalls_;
+    std::vector<Move> validMoves_;
+
     bool ValidWallRange(const WallPosition &) const;
     bool ValidWallAvailable(const WallPosition &) const;
     bool ValidWallDoNotCloseTheArrival(const WallPosition &) const;
@@ -39,5 +43,7 @@ private:
 
 	//const std::vector<std::string> arrival_e1 = { "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9" };
 	//const std::vector<std::string> arrival_e9 = { "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1" };
+
+    std::vector<WallPosition> findBlockerWalls(const PawnPosition&, const PawnPosition&) const;
 };
 

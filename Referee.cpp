@@ -1,5 +1,16 @@
 #include "Referee.h"
 
+void Referee::setBoard(const std::shared_ptr<Board>& board)
+{
+    board_ = board;
+    board_->registerHandler([this](){
+        // Action to do when board is changing
+        validPawns_.clear();
+        validwalls_.clear();
+        validMoves_.clear();
+    });
+}
+
 bool Referee::Win(const Player & player) const
 {
     if (player.startPosition() == BoardPosition("e1"))
@@ -54,31 +65,82 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
     }
 
     // Check if pawns is a legal move
-    // (next to player pawns and no wall between 2 positions)
     auto d = pawn.distance(currentPawn);
-    auto wall1 = WallPosition(pawn, currentPawn);
-    auto wall2 = wall1;
-    if (wall1.direction() == WallPosition::Direction::horizontal)
-        wall2 += Position(-1, 0);
-    else if (wall1.direction() == WallPosition::Direction::vertical)
-        wall2 += Position(0, -1);
+    auto length = d.length();
 
-    if (((d == Position(1, 0)) || (d == Position(-1, 0)) || (d == Position(0, 1)) || (d == Position(0, -1)))
-        && (!board_->exists(wall1)) && (!board_->exists(wall2)))
-        return true;
-    // Check if pawns is a legal move (next to player pawns or need jump over another pawn)
-    else
+    if (length == 1)
     {
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
+        // (next to player pawns and no wall between 2 positions)
+        // Pawn moves to next case
 
+        // Verify the pawn moves to next square
+        if ((d == Position(1, 0)) || (d == Position(-1, 0))
+            || (d == Position(0, 1)) || (d == Position(0, -1)))
+        {
+            for (const auto& wall : findBlockerWalls(currentPawn, pawn))
+            {
+                if (board_->exists(wall))
+                    return false;
+            }
+            return true;
+        }
+        else
+        {
+            // Pawn jumps over another pawn, but bounces on wall behind it.
+            if ((d == Position(1, 1)))
+            {
+                // TO DO
+                // TO DO
+            }
+            else if ((d == Position(1, -1)))
+            {
+                // TO DO
+                // TO DO
+            }
+            else if ((d == Position(-1, -1)))
+            {
+                // TO DO
+                // TO DO
+            }
+            else if ((d == Position(-1, 1)))
+            {
+                // TO DO
+                // TO DO
+            }
+
+            // TO DO
+            // TO DO
+            // TO DO
+            // TO DO
+            // TO DO
+            // TO DO
+            // TO DO
+        }
+    }
+    else if (length == 2)
+    {
+        // Pawn jumps over another pawn
+        // Where have to be the other pawn
+        auto opponent = ((Position)pawn + (Position)currentPawn) / 2;
+
+        // Verify that opponent is in the right position
+        for (const auto& p : board_->pawns())
+        {
+            if (((Position)p != (Position)currentPawn) && ((Position)p != opponent))
+                return false;
+        }
+
+        // Verify that pawn moves 2 squares ahead
+        if ((d == Position(2, 0)) || (d == Position(-2, 0))
+            || (d == Position(0, 2)) || (d == Position(0, -2)))
+        {
+            for (const auto& wall : findBlockerWalls(currentPawn, pawn))
+            {
+                if (board_->exists(wall))
+                    return false;
+            }
+            return true;
+        }
     }
 
     return false;
@@ -86,65 +148,119 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
 
 bool Referee::ValidMove(const Move &move)const
 {
-    if (move.type() == Move::Type::pawn)
-        ValidPawn(move.pawn());
-    else if (move.type() == Move::Type::wall)
-        ValidWall(move.wall());
-    else if (move.type() == Move::Type::none)
+    switch (move.type())
+    {
+    case Move::Type::pawn:
+        return ValidPawn(move.pawn());
+    case Move::Type::wall:
+        return ValidWall(move.wall());
+    case Move::Type::none:
         return false;
+    }
+    throw std::out_of_range("Unknown move to verify");
+}
+
+const std::vector<WallPosition>& Referee::getValidWalls()
+{
+    if (validwalls_.empty())
+    {
+        // For each theorical pawns, check validity
+        // Then add it to pawn list
+
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+    }
+
+    return validwalls_;
+}
+
+const std::vector<PawnPosition>& Referee::getValidPawns()
+{
+    if (validPawns_.empty())
+    {
+        // For each theorical pawns, check validity
+        // Then add it to pawn list
+
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+        // TO DO
+    }
+
+    return validPawns_;
+}
+
+const std::vector<Move>& Referee::getValidMoves()
+{
+    if (validMoves_.empty())
+    {
+        for (const auto & w : getValidWalls())
+            validMoves_.emplace_back(w);
+
+        for (const auto & p : getValidPawns())
+            validMoves_.emplace_back(p);
+    }
+    return validMoves_;
+}
+
+std::vector<WallPosition> Referee::findBlockerWalls(const PawnPosition &current, const PawnPosition &next) const
+{
+    std::vector<WallPosition> list;
+
+    auto d = next.distance(current);
+    auto length = d.length();
+
+    if ((length == 1)
+        && ((d == Position(1, 0)) || (d == Position(-1, 0))
+            || (d == Position(0, 1)) || (d == Position(0, -1))))
+    {
+        // Pawn moves to next case
+        // Find each possible walls between the 2 pawns
+        auto wall1 = WallPosition(next, current);
+        auto wall2 = wall1;
+        if (wall1.direction() == WallPosition::Direction::horizontal)
+            wall2 += Position(-1, 0);
+        else if (wall1.direction() == WallPosition::Direction::vertical)
+            wall2 += Position(0, -1);
+
+        list.emplace_back(wall1);
+        list.emplace_back(wall2);
+    }
+    else if (length > 1)
+    {
+        // middle position
+        auto middle = PawnPosition(((Position)current + (Position)next) / 2, "");
+
+        for (const auto& wall : findBlockerWalls(current, middle))
+            list.emplace_back(wall);
+
+        for (const auto& wall : findBlockerWalls(middle, next))
+            list.emplace_back(wall);
+    }
     else
-        throw std::out_of_range("Unknown move to verify");
-    // Check type of move
-    // Check wall move
-    // Check pawn move
+    {
+        std::ostringstream oss;
+        oss << "Move between " << current << " and " << next << " must be as a line.";
+        throw std::out_of_range(oss.str());
+    }
 
-    // TO DO
-    // TO DO
-    // TO DO
-    return true;
-}
-
-std::vector<WallPosition>& Referee::getValidWalls() const
-{
-    // Allocate empty wall list
-    std::vector<WallPosition> *list = new std::vector<WallPosition>;
-
-    // For each theorical pawns, check validity
-    // Then add it to wall list
-
-    // TO DO
-    // TO DO
-    // TO DO
-
-    return *list;
-}
-
-std::vector<PawnPosition>& Referee::getValidPawns() const
-{
-    // Allocate empty pawn list
-    std::vector<PawnPosition> *list = new std::vector<PawnPosition>;
-
-    // For each theorical pawns, check validity
-    // Then add it to pawn list
-
-    // TO DO
-    // TO DO
-    // TO DO
-
-    return *list;
-}
-
-std::vector<Move>& Referee::getValidMoves() const
-{
-    // Allocate empty move list
-    std::vector<Move> *list = new std::vector<Move>;
-
-    // For each theorical pawns, check validity
-    // Then add it to move list
-
-    // TO DO
-    // TO DO
-    // TO DO
-
-    return *list;
+    return list;
 }

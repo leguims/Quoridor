@@ -168,13 +168,14 @@ void Move::restore(const std::string & text)
 {
     type_ = type(text);
 
-    if (type_ == Type::pawn)
+    switch (type_)
     {
+    case Move::Type::pawn:
         player_ = PawnPosition(text);
-    }
-    else if (type_ == Type::wall)
-    {
+        break;
+    case Move::Type::wall:
         wall_ = WallPosition(text);
+        break;
     }
 }
 
@@ -191,5 +192,5 @@ const Move::Type& Move::type(const std::string & text)
 
 Position Position::distance(const Position & position) const
 {
-    return Position(position.x_ - x_, position.y_ - y_);
+    return Position(x_ - position.x_, y_ - position.y_);
 }

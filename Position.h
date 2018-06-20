@@ -4,6 +4,7 @@
 #include <ostream>
 #include <tuple>
 #include <sstream>
+#include <cmath>
 
 class Position
 {
@@ -18,6 +19,7 @@ public:
     const int x(const int x_value) { x_ = x_value; return x_; }
     const int y(const int y_value) { y_ = y_value; return y_; }
     Position distance(const Position& position) const;
+    int length() const { return std::lround(std::hypot(x_, y_)); }
 
     friend std::ostream& operator<<(std::ostream& out, const Position& position)
     {
@@ -47,6 +49,19 @@ public:
         return lhs;
     }
 
+    Position& operator/=(const int d)
+    {
+        x_ /= d;
+        y_ /= d;
+        return *this;
+    }
+
+    friend Position operator/(Position lhs, const int rhs)
+    {
+        lhs /= rhs;
+        return lhs;
+    }
+
 private:
     int x_;
     int y_;
@@ -63,6 +78,7 @@ public:
     BoardPosition() : Position{ 1, 1 } {}
     BoardPosition(const int x_value, const int y_value) { x(x_value); y(y_value); }
     BoardPosition(const std::string& position) : Position{ x(position.substr(0, 1)), y(position.substr(1, 1)) } {}
+    BoardPosition(const Position& p) { x(p.x()); y(p.y()); }
     ~BoardPosition() = default;
     BoardPosition& operator=(const BoardPosition&) = default;
 
@@ -91,27 +107,29 @@ public:
         return (Position)lhs == (Position)rhs;
     }
 
-    BoardPosition& operator+=(const BoardPosition& rhs)
+    BoardPosition& operator+=(const Position& rhs)
     {
-        Position tmp = *this;
-        tmp += (Position)rhs;
-        if (validX(tmp.x()) && validY(tmp.y()))
-        {
-            x(tmp.x());
-            y(tmp.y());
-        }
-        else
-        {
-            std::ostringstream oss;
-            oss << "Position " << tmp << " is out of board.";
-            throw std::out_of_range(oss.str());
-        }
+        x(x() + rhs.x());
+        y(y() + rhs.y());
         return *this;
     }
 
-    friend BoardPosition operator+(BoardPosition lhs, const BoardPosition& rhs)
+    friend BoardPosition operator+(BoardPosition lhs, const Position& rhs)
     {
         lhs += rhs;
+        return lhs;
+    }
+
+    BoardPosition& operator/=(const int d)
+    {
+        x(x() / d);
+        y(y() / d);
+        return *this;
+    }
+
+    friend BoardPosition operator/(BoardPosition lhs, const int rhs)
+    {
+        lhs /= rhs;
         return lhs;
     }
 
@@ -264,13 +282,14 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const Move& move)
     {
-        if (move.type_ == Type::pawn)
+        switch (move.type())
         {
+        case Move::Type::pawn:
             out << move.player_;
-        }
-        else if (move.type_ == Type::wall)
-        {
+            break;
+        case Move::Type::wall:
             out << move.wall_;
+            break;
         }
         return out;
     }
