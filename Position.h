@@ -293,7 +293,7 @@ public:
         switch (move.type())
         {
         case Move::Type::pawn:
-            out << move.player_;
+            out << (BoardPosition)move.player_; // casted to mask player name
             break;
         case Move::Type::wall:
             out << move.wall_;
