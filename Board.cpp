@@ -53,7 +53,6 @@ void Board::add(const Move & move)
         break;
     default:
         throw std::out_of_range("Unknown move to add to the board");
-
     }
 }
 

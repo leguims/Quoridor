@@ -34,7 +34,7 @@ void Game::move()
     //std::cout << "Round = " << round << std::endl;
 
     auto& current_player = players_.at(index_player_);
-    auto move = current_player.getNextMove(round, *board_, referee_.getValidPawns(current_player.name()), referee_.getValidWalls());
+    auto move = current_player.getNextMove(round, *board_, referee_.getValidPawns(current_player.name()), referee_.getValidWalls(current_player.haveWall()));
     move.playerName(current_player.name());
     if (referee_.ValidMove(move))
     {

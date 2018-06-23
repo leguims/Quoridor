@@ -51,12 +51,20 @@ bool Referee::Win(const Player & player) const
     return false;
 }
 
-bool Referee::ValidWall(const WallPosition &) const
+bool Referee::ValidWall(const WallPosition &wall) const
 {
-    // Check if player have at least 1 wall
-    // Check range of pawns
-    // Check if wall is already in pawns or crosses the pawns
+    // Check if player have at least 1 wall ==> done by getValidWalls()
+
+    // Check range of walls ==> Already done in 'WallPosition'
+
+    // Check if wall is already on board or crosses another wall
+    auto crossedWall = wall;
+    crossedWall.direction(wall.oppositeDirection());
+    if (board_->existsWall(wall) or board_->existsWall(crossedWall))
+        return false;
+
     // Check if wall close the path to arrival
+    // USE HERE A-STAR algo
 
     // TO DO
     // TO DO
@@ -93,8 +101,6 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
         }
         else
         {
-            //try
-            //{
             // Pawn jumps over another pawn, but bounces on wall behind it.
             std::vector<std::tuple<Position, Position, WallPosition>> tests;
             //std::vector<     distance    , opponent,     wall    >> tests;
@@ -110,7 +116,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x(), currentPawn.y() - 2, WallPosition::Direction::horizontal)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(1, 1),
@@ -118,7 +124,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() - 1, currentPawn.y() - 2, WallPosition::Direction::horizontal)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(1, 1),
@@ -126,7 +132,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() - 2, currentPawn.y(), WallPosition::Direction::vertical)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(1, 1),
@@ -134,7 +140,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() - 2, currentPawn.y() - 1, WallPosition::Direction::vertical)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(1, -1),
@@ -142,7 +148,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() - 2, currentPawn.y(), WallPosition::Direction::vertical)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(1, -1),
@@ -150,7 +156,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() - 2, currentPawn.y() - 1, WallPosition::Direction::vertical)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(1, -1),
@@ -158,7 +164,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x(), currentPawn.y() + 1, WallPosition::Direction::horizontal)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(1, -1),
@@ -166,7 +172,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() - 1, currentPawn.y() + 1, WallPosition::Direction::horizontal)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(-1, -1),
@@ -174,7 +180,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x(), currentPawn.y() + 1, WallPosition::Direction::horizontal)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(-1, -1),
@@ -182,7 +188,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() - 1, currentPawn.y() + 1, WallPosition::Direction::horizontal)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(-1, -1),
@@ -190,7 +196,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() + 1, currentPawn.y(), WallPosition::Direction::vertical)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(-1, -1),
@@ -198,7 +204,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() + 1, currentPawn.y() - 1, WallPosition::Direction::vertical)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(-1, 1),
@@ -206,7 +212,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() + 1, currentPawn.y(), WallPosition::Direction::vertical)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(-1, 1),
@@ -214,7 +220,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() + 1, currentPawn.y() - 1, WallPosition::Direction::vertical)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(-1, 1),
@@ -222,7 +228,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x(), currentPawn.y() - 2, WallPosition::Direction::horizontal)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
             try {
                 tests.emplace_back(
                     Position(-1, 1),
@@ -230,7 +236,7 @@ bool Referee::ValidPawn(const PawnPosition &pawn) const
                     WallPosition(currentPawn.x() - 1, currentPawn.y() - 2, WallPosition::Direction::horizontal)
                 );
             }
-            catch (const std::out_of_range &) {} // one element is out of noard, ignore the test 
+            catch (const std::out_of_range &) {} // one element is out of board, ignore the test 
 
             Position distance;
             Position opponent;
@@ -288,25 +294,27 @@ bool Referee::ValidMove(const Move &move)const
     throw std::out_of_range("Unknown move to verify");
 }
 
-const std::vector<WallPosition>& Referee::getValidWalls()
+const std::vector<WallPosition>& Referee::getValidWalls(const bool haveWall)
 {
-    if (validwalls_.empty())
+    if (validwalls_.empty() && haveWall)
     {
-        // For each theorical pawns, check validity
-        // Then add it to pawn list
-
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
-        // TO DO
+        WallPosition wall;
+        // For each theorical walls, check validity
+        for (const auto& x : { 1,2,3,4,5,6,7,8 })
+        {
+            wall.x(x);
+            for (const auto& y : { 1,2,3,4,5,6,7,8 })
+            {
+                wall.y(y);
+                for (const auto& d : { WallPosition::Direction::horizontal,WallPosition::Direction::vertical })
+                {
+                    wall.direction(d);
+                    // Then add it to wall list
+                    if (ValidWall(wall))
+                        validwalls_.push_back(wall);
+                }
+            }
+        }
     }
 
     return validwalls_;
@@ -320,9 +328,10 @@ const std::vector<PawnPosition>& Referee::getValidPawns(const PlayerName & playe
         // For each theorical pawns, check validity
         for (const auto& x : { 1,2,3,4,5,6,7,8,9 })
         {
+            pawn.x(x);
             for (const auto& y : { 1,2,3,4,5,6,7,8,9 })
             {
-                pawn.position(x, y);
+                pawn.y(y);
                 // Then add it to pawn list
                 if (ValidPawn(pawn))
                     validPawns_.push_back(pawn);
@@ -333,18 +342,18 @@ const std::vector<PawnPosition>& Referee::getValidPawns(const PlayerName & playe
     return validPawns_;
 }
 
-const std::vector<Move>& Referee::getValidMoves(const PlayerName & player)
-{
-    if (validMoves_.empty())
-    {
-        for (const auto & w : getValidWalls())
-            validMoves_.emplace_back(w);
-
-        for (const auto & p : getValidPawns(player))
-            validMoves_.emplace_back(p);
-    }
-    return validMoves_;
-}
+//const std::vector<Move>& Referee::getValidMoves(const PlayerName & player)
+//{
+//    if (validMoves_.empty())
+//    {
+//        for (const auto & w : getValidWalls())
+//            validMoves_.emplace_back(w);
+//
+//        for (const auto & p : getValidPawns(player))
+//            validMoves_.emplace_back(p);
+//    }
+//    return validMoves_;
+//}
 
 std::vector<WallPosition> Referee::findBlockerWalls(const BoardPosition &current, const BoardPosition &next) const
 {

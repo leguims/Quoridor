@@ -199,6 +199,7 @@ public:
     void direction(const Direction& direction) { direction_ = direction; }
     const Direction direction(const std::string&);
     const Direction direction() const { return direction_; }
+    const Direction oppositeDirection() const { return direction_==Direction::horizontal?Direction::vertical:Direction::horizontal; }
 
     WallPosition shiftedWallPosition(Position) const;
 
