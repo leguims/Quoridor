@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="a-star\source\AStar.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -123,6 +124,7 @@
     <ClCompile Include="Referee.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="a-star\source\AStar.hpp" />
     <ClInclude Include="Board.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Game.h" />
