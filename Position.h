@@ -182,8 +182,8 @@ class WallPosition : public BoardPosition
 public:
     enum class Direction { horizontal, vertical };
 
-    WallPosition() = default;
-    WallPosition(const int x_value, const int y_value) { x(x_value); y(y_value); }
+    WallPosition() noexcept : direction_{ Direction::horizontal } {};
+    WallPosition(const int x_value, const int y_value) : direction_{ Direction::horizontal } { x(x_value); y(y_value); }
 
 
     WallPosition(const int x, const int y, const Direction& direction) : BoardPosition(x, y), direction_(direction) {}

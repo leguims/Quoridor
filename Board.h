@@ -30,9 +30,6 @@ public:
     const int heigth() const { return heigth_; }
     void width(const int value) { width_ = value; }
     void heigth(const int value) { heigth_ = value; }
-    // To remove ?
-    //const std::vector<PawnPosition>& playersPosition() { return pawnsPosition_; }
-    //std::vector<WallPosition>& wallsPosition() { return wallsPosition_; }
 
 private:
     int width_;
@@ -45,7 +42,6 @@ private:
     void add(const PawnPosition & pawn);
     void add(const WallPosition & wall);
     void callHandlers();
-    //void add(AStar::Generator &, const WallPosition &) const;
 };
 
 

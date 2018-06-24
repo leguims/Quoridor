@@ -75,22 +75,6 @@ PawnPosition& Board::getPawnNonConst(const PlayerName& name)
     return *player;
 }
 
-//void Board::add(AStar::Generator& generator, const WallPosition& wall) const
-//{
-//    if (wall.direction() == WallPosition::Direction::horizontal)
-//    {
-//        generator.addCollision({ 2 * wall.x() - 2, 2 * wall.y() - 1 });
-//        generator.addCollision({ 2 * wall.x() - 2 + 1, 2 * wall.y() - 1 });
-//        generator.addCollision({ 2 * wall.x() - 2 + 2, 2 * wall.y() - 1 });
-//    }
-//    else
-//    {
-//        generator.addCollision({ 2 * wall.x() - 1, 2 * wall.y() - 2 });
-//        generator.addCollision({ 2 * wall.x() - 1, 2 * wall.y() - 2 + 1 });
-//        generator.addCollision({ 2 * wall.x() - 1, 2 * wall.y() - 2 + 2 });
-//    }
-//}
-
 const PawnPosition & Board::getPawn(const PlayerName& name) const
 {
     return (const_cast<Board*>(this))->getPawnNonConst(name);

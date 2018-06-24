@@ -70,7 +70,10 @@ void Game::move()
     }
     else
     {
-        std::cout << "Round " << round << " : " << current_player.name() << " plays invalid move, game is over." << std::endl;
+        if (move.type() == Move::Type::none)
+            std::cout << "Round " << round << " : " << current_player.name() << " does not play and surrenders, game is over." << std::endl;
+        else
+            std::cout << "Round " << round << " : " << current_player.name() << " plays invalid move, game is over." << std::endl;
         inGame = false;
         referee_.illegalMove(current_player.name());
     }

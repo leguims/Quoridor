@@ -27,20 +27,6 @@ const int BoardPosition::y(const std::string& text)
     return y(Position::y(text));
 }
 
-//const int BoardPosition::x(const std::string& text)
-//{
-//    if (text.size() != 1)
-//        throw std::out_of_range("X should have size to 1 not " + text.size());
-//    return x(text[0] - 'a' + 1);
-//}
-//
-//const int BoardPosition::y(const std::string& text)
-//{
-//    if (text.size() != 1)
-//        throw std::out_of_range("Y should have size to 1 not " + text.size());
-//    return y(std::stoul(text.substr(0, 1)));
-//}
-
 bool BoardPosition::validX(const int x)
 {
     return ((1 <= x) && (x <= 9));

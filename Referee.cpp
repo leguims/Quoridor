@@ -371,19 +371,6 @@ const std::vector<PawnPosition>& Referee::getValidPawns(const PlayerName & playe
     return validPawns_;
 }
 
-//const std::vector<Move>& Referee::getValidMoves(const PlayerName & player)
-//{
-//    if (validMoves_.empty())
-//    {
-//        for (const auto & w : getValidWalls())
-//            validMoves_.emplace_back(w);
-//
-//        for (const auto & p : getValidPawns(player))
-//            validMoves_.emplace_back(p);
-//    }
-//    return validMoves_;
-//}
-
 std::vector<WallPosition> Referee::findBlockerWalls(const BoardPosition &current, const BoardPosition &next) const
 {
     std::vector<WallPosition> list;
