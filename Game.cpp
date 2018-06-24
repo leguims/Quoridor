@@ -13,13 +13,17 @@ void Game::chooseReferee()
 void Game::choosePlayers()
 {
     // Ask user to choose players : human, IA ?
-    players_.emplace_back("Player 1", Player::Color::black, BoardPosition("e1"));
-    players_.emplace_back("Player 2", Player::Color::red, BoardPosition("e9"));
+    players_ = std::make_shared<std::vector<Player>>();
+
+    players_->emplace_back("Player 1", Player::Color::black, BoardPosition("e1"));
+    players_->emplace_back("Player 2", Player::Color::red, BoardPosition("e9"));
+
+    referee_.setPlayers(players_);
 }
 
 void Game::launch()
 {
-    referee_.reset(players_);
+    referee_.launch();
     inGame = true;
 }
 
@@ -29,12 +33,12 @@ void Game::move()
         return;
 
     // change player
-    index_player_ = ++index_player_ % players_.size();
+    index_player_ = ++index_player_ % players_->size();
     auto round = (index_player_ == 0 ? moveList_.size() + 1 : moveList_.size());
     //std::cout << "Round = " << round << std::endl;
 
-    auto& current_player = players_.at(index_player_);
-    auto move = current_player.getNextMove(round, *board_, referee_.getValidPawns(current_player.name()), referee_.getValidWalls(current_player.haveWall()));
+    auto& current_player = players_->at(index_player_);
+    auto move = current_player.getNextMove(round, *board_, referee_.getValidPawns(current_player.name()), referee_.getValidWalls(current_player.name()));
     move.playerName(current_player.name());
     if (referee_.ValidMove(move))
     {
@@ -61,13 +65,14 @@ void Game::move()
             current_player.removeWall();
 
         // Check if game is over
-        if (referee_.Win(current_player))
+        if (referee_.Win(current_player.name()))
             inGame = false;
     }
     else
     {
-        std::cout << "Round " << moveList_.size() << " : " << current_player.name() << " : Invalid move, game is over." << std::endl;
+        std::cout << "Round " << round << " : " << current_player.name() << " plays invalid move, game is over." << std::endl;
         inGame = false;
+        referee_.illegalMove(current_player.name());
     }
 }
 
@@ -87,9 +92,9 @@ Game::Result Game::getResult() const
 {
     if (inGame)
         return Game::Result::inProgress;
-    else if (referee_.Win(players_[0]))
+    else if (referee_.Win((*players_)[0].name()))
         return Game::Result::win1;
-    else if (referee_.Win(players_[1]))
+    else if (referee_.Win((*players_)[1].name()))
         return Game::Result::win2;
     else
         return Game::Result::draw;

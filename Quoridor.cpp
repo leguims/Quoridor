@@ -13,6 +13,11 @@ int main()
     }
 
     {
+        BoardPosition position("e1");
+        std::cout << "Position : " << position << std::endl;
+    }
+
+    {
         PawnPosition pawnPosition(5, 9, "Gerard");
         std::cout << "PawnPosition : " << pawnPosition << std::endl;
     }

@@ -38,7 +38,7 @@ public:
     }
 
 public:
-    Game() : board_{ std::make_shared<Board>() }, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
+    Game() noexcept : board_{ std::make_shared<Board>() }, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
     ~Game() = default;
     void chooseReferee();
     void choosePlayers();
@@ -60,7 +60,7 @@ public:
         out << "Rules : " << game.referee_ << std::endl;
 
         auto index = 1;
-        for (const auto &player : game.players_)
+        for (const auto &player : *game.players_)
         {
             out << "Player " << index ++ << " : " << player << std::endl;
         }
@@ -82,7 +82,7 @@ public:
 private:
     Referee referee_;
     std::shared_ptr<Board> board_;
-    std::vector<Player> players_;
+    std::shared_ptr<std::vector<Player>> players_;
     std::vector<std::pair<Move, Move>> moveList_;
 
     bool inGame;

@@ -10,15 +10,17 @@ class Referee
 public:
     Referee() = default;
     ~Referee() = default;
-    void setBoard(const std::shared_ptr<Board> & board);
-    void reset(const std::vector<Player>& players);
+    void setBoard(const std::shared_ptr<Board>& board);
+    void setPlayers(const std::shared_ptr<std::vector<Player>> & players);
+    void launch();
 
-	bool Win(const Player & player) const;
-	bool ValidWall(const WallPosition &) const;
-    bool ValidPawn(const PawnPosition &) const;
-    bool ValidMove(const Move &) const;
-    const std::vector<WallPosition>& getValidWalls(const bool haveWall);
-    const std::vector<PawnPosition>& getValidPawns(const PlayerName & player);
+    bool Win(const PlayerName&) const;
+    void illegalMove(const PlayerName&);
+    bool ValidWall(const WallPosition&) const;
+    bool ValidPawn(const PawnPosition&) const;
+    bool ValidMove(const Move&) const;
+    const std::vector<WallPosition>& getValidWalls(const PlayerName&);
+    const std::vector<PawnPosition>& getValidPawns(const PlayerName&);
     //const std::vector<Move>& getValidMoves(const PlayerName & player);
 
     friend std::ostream& operator<<(std::ostream& out, const Referee& referee)
@@ -29,13 +31,15 @@ public:
 
 private:
     std::shared_ptr<Board> board_;
+    std::shared_ptr<std::vector<Player>> players_;
     std::vector<PawnPosition> validPawns_;
     std::vector<WallPosition> validwalls_;
     std::vector<Move> validMoves_;
+    PlayerName illegalMove_;
 
-    bool ValidWallRange(const WallPosition &) const;
-    bool ValidWallAvailable(const WallPosition &) const;
-    bool ValidWallDoNotCloseTheArrival(const WallPosition &) const;
+    //bool ValidWallRange(const WallPosition &) const;
+    //bool ValidWallAvailable(const WallPosition &) const;
+    //bool ValidWallDoNotCloseTheArrival(const WallPosition &) const;
 
     //bool ValidPawnRange(const PawnPosition &) const;
     //bool ValidPawnFree(const PawnPosition &) const;
@@ -46,5 +50,6 @@ private:
 
     std::vector<WallPosition> findBlockerWalls(const BoardPosition&, const BoardPosition&) const;
     bool noBlockerWalls(const BoardPosition&, const BoardPosition&) const;
+    Player& find(const PlayerName&) const;
 };
 

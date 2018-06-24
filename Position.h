@@ -9,15 +9,19 @@
 class Position
 {
 public:
-    Position() : x_(0), y_(0) {}
+    Position() noexcept : x_(0), y_(0) {}
     Position(const int x_value, const int y_value) : x_(x_value), y_(y_value) {}
+    Position(const std::string& position) : Position(x(position.substr(0, 1)), y(position.substr(1, 1))) {}
     ~Position() = default;
-    Position& operator=(const Position&) = default;
+    virtual Position& operator=(const Position&) = default;
 
-    const int x() const { return x_; }
-    const int y() const { return y_; }
-    const int x(const int x_value) { x_ = x_value; return x_; }
-    const int y(const int y_value) { y_ = y_value; return y_; }
+    virtual const int x() const { return x_; }
+    virtual const int y() const { return y_; }
+    virtual const int x(const int x_value) { x_ = x_value; return x_; }
+    virtual const int y(const int y_value) { y_ = y_value; return y_; }
+    virtual const int x(const std::string&);
+    virtual const int y(const std::string&);
+
     Position distance(const Position& position) const;
     int length() const { return std::lround(std::hypot(x_, y_)); }
 
@@ -36,7 +40,7 @@ public:
         return std::tie(lhs.x_, lhs.y_) == std::tie(rhs.x_, rhs.y_);
     }
 
-    Position& operator+=(const Position& rhs)
+    virtual Position& operator+=(const Position& rhs)
     {
         x_ += rhs.x_;
         y_ += rhs.y_;
@@ -49,7 +53,7 @@ public:
         return lhs;
     }
 
-    Position& operator/=(const int d)
+    virtual Position& operator/=(const int d)
     {
         x_ /= d;
         y_ /= d;
@@ -75,23 +79,23 @@ inline bool operator!=(const Position& lhs, const Position& rhs) { return !(lhs 
 class BoardPosition : public Position
 {
 public:
-    BoardPosition() : Position{ 1, 1 } {}
+    BoardPosition() noexcept : Position{ 1, 1 } {}
     BoardPosition(const int x_value, const int y_value) { x(x_value); y(y_value); }
-    BoardPosition(const std::string& position) : Position{ x(position.substr(0, 1)), y(position.substr(1, 1)) } {}
+    BoardPosition(const std::string& position) : Position{ position.substr(0, 2) } { x(x()); y(y()); }
     BoardPosition(const Position& p) { x(p.x()); y(p.y()); }
     ~BoardPosition() = default;
-    BoardPosition& operator=(const BoardPosition&) = default;
+    virtual BoardPosition& operator=(const BoardPosition&) = default;
 
-    const int x() const { return Position::x(); }
-    const int y() const { return Position::y(); }
-    const int x(const int x);
-    const int y(const int y);
-    const int x(const std::string & x);
-    const int y(const std::string & y);
+    const int x() const override { return Position::x(); }
+    const int y() const override { return Position::y(); }
+    const int x(const int x) override;
+    const int y(const int y) override;
+    const int x(const std::string&) override;
+    const int y(const std::string&) override;
     void position(const int x_value, const int y_value) { x(x_value); y(y_value); }
-    Position position() { return (Position)*this; }
+    Position position() const { return (Position)*this; }
 
-    void restore(const std::string&);
+    virtual void restore(const std::string&);
 
     friend std::ostream& operator<<(std::ostream& out, const BoardPosition& position)
     {
@@ -136,8 +140,8 @@ public:
     }
 
 private:
-    bool validX(const int x);
-    bool validY(const int y);
+    virtual bool validX(const int x);
+    virtual bool validY(const int y);
 };
 
 inline bool operator> (const BoardPosition& lhs, const BoardPosition& rhs) { return rhs < lhs; }
@@ -157,7 +161,7 @@ public:
 
     void playerName(const PlayerName& playerName) { playerName_ = playerName; }
     const PlayerName& playerName() const { return playerName_; }
-    void restore(const std::string&);
+    void restore(const std::string&) override;
     void restore(const std::string&, const PlayerName&);
 
     friend std::ostream& operator<<(std::ostream& out, const PawnPosition& position)
@@ -199,11 +203,11 @@ public:
     void direction(const Direction& direction) { direction_ = direction; }
     const Direction direction(const std::string&);
     const Direction direction() const { return direction_; }
-    const Direction oppositeDirection() const { return direction_==Direction::horizontal?Direction::vertical:Direction::horizontal; }
+    const Direction oppositeDirection() const { return direction_ == Direction::horizontal ? Direction::vertical : Direction::horizontal; }
 
     WallPosition shiftedWallPosition(Position) const;
 
-    void restore(const std::string&);
+    void restore(const std::string&) override;
 
     friend std::ostream& operator<<(std::ostream& out, const WallPosition& position)
     {
@@ -277,7 +281,7 @@ class Move
 {
 public:
     enum class Type { pawn, wall, none };
-    Move() : type_{ Type::none }, player_{}, wall_{} {}
+    Move() noexcept : type_{ Type::none }, player_{}, wall_{} {}
     Move(const PawnPosition &player) : type_{ Type::pawn }, player_{ player }, wall_{} {}
     Move(const WallPosition &wall) : type_{ Type::wall }, player_{}, wall_{ wall } {}
     Move(const std::string &text) : type_{ type(text) }, player_{ type_ == Type::pawn ? PawnPosition(text) : PawnPosition() }, wall_{ type_ == Type::wall ? WallPosition(text) : WallPosition() } {}

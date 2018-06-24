@@ -19,17 +19,27 @@ const int BoardPosition::y(const int y)
 
 const int BoardPosition::x(const std::string& text)
 {
-    if (text.size() != 1)
-        throw std::out_of_range("X should have size to 1 not " + text.size());
-    return x(text[0] - 'a' + 1);
+    return x(Position::x(text));
 }
 
 const int BoardPosition::y(const std::string& text)
 {
-    if (text.size() != 1)
-        throw std::out_of_range("Y should have size to 1 not " + text.size());
-    return y(std::stoul(text.substr(0, 1)));
+    return y(Position::y(text));
 }
+
+//const int BoardPosition::x(const std::string& text)
+//{
+//    if (text.size() != 1)
+//        throw std::out_of_range("X should have size to 1 not " + text.size());
+//    return x(text[0] - 'a' + 1);
+//}
+//
+//const int BoardPosition::y(const std::string& text)
+//{
+//    if (text.size() != 1)
+//        throw std::out_of_range("Y should have size to 1 not " + text.size());
+//    return y(std::stoul(text.substr(0, 1)));
+//}
 
 bool BoardPosition::validX(const int x)
 {
@@ -47,7 +57,7 @@ void BoardPosition::restore(const std::string &text)
     y(text.substr(1, 1));
 }
 
-WallPosition::WallPosition(const BoardPosition & a, const BoardPosition & b)
+WallPosition::WallPosition(const BoardPosition & a, const BoardPosition & b): direction_(Direction::vertical)
 {
     auto d = a.distance(b);
     if (d == Position(1, 0))
@@ -232,6 +242,20 @@ const Move::Type& Move::type(const std::string & text)
     else
         type_ = Type::none;
     return type_;
+}
+
+const int Position::x(const std::string& text)
+{
+    if (text.size() != 1)
+        throw std::out_of_range("X should have size to 1 not " + text.size());
+    return Position::x(text[0] - 'a' + 1);
+}
+
+const int Position::y(const std::string& text)
+{
+    if (text.size() != 1)
+        throw std::out_of_range("Y should have size to 1 not " + text.size());
+    return Position::y(static_cast<int>(std::stoul(text.substr(0, 1))));
 }
 
 Position Position::distance(const Position & position) const

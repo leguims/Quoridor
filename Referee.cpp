@@ -1,8 +1,13 @@
 #include "Referee.h"
 
-void Referee::setBoard(const std::shared_ptr<Board>& board)
+#include <algorithm>
+
+void Referee::setBoard(const std::shared_ptr<Board> & board)
 {
     board_ = board;
+    board_->width(9);
+    board_->heigth(9);
+
     board_->registerHandler([this]() {
         // Action to do when board is changing
         validPawns_.clear();
@@ -11,14 +16,40 @@ void Referee::setBoard(const std::shared_ptr<Board>& board)
     });
 }
 
-void Referee::reset(const std::vector<Player>& players)
+void Referee::setPlayers(const std::shared_ptr<std::vector<Player>> & players)
+{
+    players_ = players;
+
+    for (auto& p : *players_)
+    {
+        if (p.startPosition() == BoardPosition("e1"))
+        {
+            const auto& arrival_e1 = { "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9", };
+            for (const auto &arrival : arrival_e1)
+            {
+                p.addArrival(std::string(arrival));
+            }
+        }
+        else if (p.startPosition() == BoardPosition("e9"))
+        {
+            const auto& arrival_e9 = { "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1" };
+            for (const auto &arrival : arrival_e9)
+            {
+                p.addArrival(std::string(arrival));
+            }
+        }
+    }
+}
+
+void Referee::launch()
 {
     // Initialize start position for players
-    for (const auto& p : players)
+    for (const auto& p : *players_)
     {
         Move move = PawnPosition(p.startPosition(), p.name());
         board_->add(move);
     }
+    illegalMove_.clear(); // No illegal move
 
     // Action to do when board is changing
     validPawns_.clear();
@@ -26,29 +57,25 @@ void Referee::reset(const std::vector<Player>& players)
     validMoves_.clear();
 }
 
-bool Referee::Win(const Player & player) const
+bool Referee::Win(const PlayerName & name) const
 {
-    if (player.startPosition() == BoardPosition("e1"))
+    if (!illegalMove_.empty() && (illegalMove_ != name))
+        return true;
+
+    auto& player = find(name);
+    auto currentPosition = board_->getPawn(name);
+    for (const auto& arrival : player.arrivalPosition())
     {
-        auto pl = board_->getPawn(player.name());
-        const auto& arrival_e1 = { "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9", };
-        for (const auto &arrival : arrival_e1)
-        {
-            if (pl == std::string(arrival))
-                return true;
-        }
+        if (currentPosition == arrival)
+            return true;
     }
-    else if (player.startPosition() == BoardPosition("e9"))
-    {
-        auto pl = board_->getPawn(player.name());
-        const auto& arrival_e9 = { "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1" };
-        for (const auto &arrival : arrival_e9)
-        {
-            if (pl == std::string(arrival))
-                return true;
-        }
-    }
+
     return false;
+}
+
+void Referee::illegalMove(const PlayerName &name)
+{
+    illegalMove_ = name;
 }
 
 bool Referee::ValidWall(const WallPosition &wall) const
@@ -64,11 +91,12 @@ bool Referee::ValidWall(const WallPosition &wall) const
         return false;
 
     // Check if wall close the path to arrival
-    // USE HERE A-STAR algo
+    for (const auto& p : *players_)
+    {
+        if (!board_->findPath(wall, p.name(), p.arrivalPosition()))
+            return false;
+    }
 
-    // TO DO
-    // TO DO
-    // TO DO
     return true;
 }
 
@@ -294,9 +322,10 @@ bool Referee::ValidMove(const Move &move)const
     throw std::out_of_range("Unknown move to verify");
 }
 
-const std::vector<WallPosition>& Referee::getValidWalls(const bool haveWall)
+const std::vector<WallPosition>& Referee::getValidWalls(const PlayerName& name)
 {
-    if (validwalls_.empty() && haveWall)
+    auto& player = find(name);
+    if (validwalls_.empty() && player.haveWall())
     {
         WallPosition wall;
         // For each theorical walls, check validity
@@ -421,4 +450,16 @@ bool Referee::noBlockerWalls(const BoardPosition &p1, const BoardPosition &p2) c
             return false;
     }
     return true;
+}
+
+Player& Referee::find(const PlayerName& name) const
+{
+    // Find player by name in vector
+    auto player = std::find_if(players_->begin(), players_->end(),
+        [name](const Player& p)->bool { return (p.name() == name); });
+
+    if (player == players_->end())
+        throw std::out_of_range("Player " + name + " unknown");
+
+    return *player;
 }
