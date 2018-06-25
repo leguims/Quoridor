@@ -11,7 +11,7 @@ public:
     Referee() = default;
     ~Referee() = default;
     void setBoard(const std::shared_ptr<Board>& board);
-    void setPlayers(const std::shared_ptr<std::vector<Player>> & players);
+    void setPlayers(const std::shared_ptr<std::vector<Player*>> & players);
     void launch();
 
     bool Win(const PlayerName&) const;
@@ -30,7 +30,7 @@ public:
 
 private:
     std::shared_ptr<Board> board_;
-    std::shared_ptr<std::vector<Player>> players_;
+    std::shared_ptr<std::vector<Player*>> players_;
     std::vector<PawnPosition> validPawns_;
     std::vector<WallPosition> validwalls_;
     std::vector<Move> validMoves_;

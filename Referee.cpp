@@ -16,26 +16,26 @@ void Referee::setBoard(const std::shared_ptr<Board> & board)
     });
 }
 
-void Referee::setPlayers(const std::shared_ptr<std::vector<Player>> & players)
+void Referee::setPlayers(const std::shared_ptr<std::vector<Player*>> & players)
 {
     players_ = players;
 
     for (auto& p : *players_)
     {
-        if (p.startPosition() == BoardPosition("e1"))
+        if (p->startPosition() == BoardPosition("e1"))
         {
             const auto& arrival_e1 = { "a9", "b9", "c9", "d9", "e9", "f9", "g9", "h9", "i9", };
             for (const auto &arrival : arrival_e1)
             {
-                p.addArrival(std::string(arrival));
+                p->addArrival(std::string(arrival));
             }
         }
-        else if (p.startPosition() == BoardPosition("e9"))
+        else if (p->startPosition() == BoardPosition("e9"))
         {
             const auto& arrival_e9 = { "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1", "i1" };
             for (const auto &arrival : arrival_e9)
             {
-                p.addArrival(std::string(arrival));
+                p->addArrival(std::string(arrival));
             }
         }
     }
@@ -46,7 +46,7 @@ void Referee::launch()
     // Initialize start position for players
     for (const auto& p : *players_)
     {
-        Move move = PawnPosition(p.startPosition(), p.name());
+        Move move = PawnPosition(p->startPosition(), p->name());
         board_->add(move);
     }
     illegalMove_.clear(); // No illegal move
@@ -93,7 +93,7 @@ bool Referee::ValidWall(const WallPosition &wall) const
     // Check if wall close the path to arrival
     for (const auto& p : *players_)
     {
-        if (!board_->findPath(wall, p.name(), p.arrivalPosition()))
+        if (!board_->findPath(wall, p->name(), p->arrivalPosition()))
             return false;
     }
 
@@ -443,10 +443,10 @@ Player& Referee::find(const PlayerName& name) const
 {
     // Find player by name in vector
     auto player = std::find_if(players_->begin(), players_->end(),
-        [name](const Player& p)->bool { return (p.name() == name); });
+        [name](const Player *p)->bool { return (p->name() == name); });
 
     if (player == players_->end())
         throw std::out_of_range("Player " + name + " unknown");
 
-    return *player;
+    return *(*player); // *(*iter)
 }

@@ -41,18 +41,19 @@ public:
     Game() noexcept : board_{ std::make_shared<Board>() }, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
     ~Game() = default;
     void chooseReferee();
-    void choosePlayers();
+    void choosePlayers(Player * const p1 = new Player{ "Player 1", Player::Color::black, BoardPosition("e1") },
+        Player * const p2 = new Player{ "Player 2", Player::Color::red, BoardPosition("e9") });
     void launch();
     void move();
     //void save();
     Result getResult() const;
-	const Referee& referee() const { return referee_; }
+    const Referee& referee() const { return referee_; }
 
     friend std::ostream& operator<<(std::ostream& out, const Game& game)
     {
         // Save to file the game.
 
-        auto now = std::chrono::system_clock::now(); 
+        auto now = std::chrono::system_clock::now();
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
 #pragma warning(suppress : 4996) // to use std::localtime() deprecated
         out << "Date : " << std::put_time(std::localtime(&in_time_t), "%d/%m/%Y %H:%M:%S") << std::endl;
@@ -62,15 +63,15 @@ public:
         auto index = 1;
         for (const auto &player : *game.players_)
         {
-            out << "Player " << index ++ << " : " << player << std::endl;
+            out << "Player " << index++ << " : " << *player << std::endl;
         }
 
         out << "Result : " << game.getResult() << std::endl;
 
-		// out << "Notation : Glendenning/Alternative" << std::endl;
+        // out << "Notation : Glendenning/Alternative" << std::endl;
 
-		out << "Game moves : " << std::endl;
-		index = 1;
+        out << "Game moves : " << std::endl;
+        index = 1;
         for (const auto &move : game.moveList_)
         {
             out << index++ << "." << move.first << "\t" << move.second << std::endl;
@@ -82,7 +83,7 @@ public:
 private:
     Referee referee_;
     std::shared_ptr<Board> board_;
-    std::shared_ptr<std::vector<Player>> players_;
+    std::shared_ptr<std::vector<Player*>> players_;
     std::vector<std::pair<Move, Move>> moveList_;
 
     bool inGame;

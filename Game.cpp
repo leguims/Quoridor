@@ -10,13 +10,13 @@ void Game::chooseReferee()
     referee_.setBoard(board_);
 }
 
-void Game::choosePlayers()
+void Game::choosePlayers(Player * const p1, Player * const p2)
 {
     // Ask user to choose players : human, IA ?
-    players_ = std::make_shared<std::vector<Player>>();
+    players_ = std::make_shared<std::vector<Player*>>();
 
-    players_->emplace_back("Player 1", Player::Color::black, BoardPosition("e1"));
-    players_->emplace_back("Player 2", Player::Color::red, BoardPosition("e9"));
+    players_->push_back(p1);
+    players_->push_back(p2);
 
     referee_.setPlayers(players_);
 }
@@ -38,8 +38,9 @@ void Game::move()
     //std::cout << "Round = " << round << std::endl;
 
     auto& current_player = players_->at(index_player_);
-    auto move = current_player.getNextMove(round, *board_, referee_.getValidPawns(current_player.name()), referee_.getValidWalls(current_player.name()));
-    move.playerName(current_player.name());
+    auto current_name = current_player->name();
+    auto move = current_player->getNextMove(round, *board_, referee_.getValidPawns(current_name), referee_.getValidWalls(current_name));
+    move.playerName(current_name);
     if (referee_.ValidMove(move))
     {
         if (index_player_ == 0)
@@ -62,20 +63,20 @@ void Game::move()
 
         // Remove a wall to player
         if (move.type() == Move::Type::wall)
-            current_player.removeWall();
+            current_player->removeWall();
 
         // Check if game is over
-        if (referee_.Win(current_player.name()))
+        if (referee_.Win(current_name))
             inGame = false;
     }
     else
     {
         if (move.type() == Move::Type::none)
-            std::cout << "Round " << round << " : " << current_player.name() << " does not play and surrenders, game is over." << std::endl;
+            std::cout << "Round " << round << " : " << current_name << " does not play and surrenders, game is over." << std::endl;
         else
-            std::cout << "Round " << round << " : " << current_player.name() << " plays invalid move, game is over." << std::endl;
+            std::cout << "Round " << round << " : " << current_name << " plays invalid move (" << move << "), game is over." << std::endl;
         inGame = false;
-        referee_.illegalMove(current_player.name());
+        referee_.illegalMove(current_name);
     }
 }
 
@@ -95,9 +96,9 @@ Game::Result Game::getResult() const
 {
     if (inGame)
         return Game::Result::inProgress;
-    else if (referee_.Win((*players_)[0].name()))
+    else if (referee_.Win((*players_)[0]->name()))
         return Game::Result::win1;
-    else if (referee_.Win((*players_)[1].name()))
+    else if (referee_.Win((*players_)[1]->name()))
         return Game::Result::win2;
     else
         return Game::Result::draw;
