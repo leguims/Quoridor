@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 Player::Player(const PlayerName & name, const Color & color, const BoardPosition & startPosition) :
     name_{ name }, color_{ color }, walls_{ 10 }, startPosition_{ startPosition }, arrivalPosition_{}
@@ -30,3 +31,13 @@ Move Player::getNextMove(const unsigned int round, const Board &board, const std
         return startPosition() == BoardPosition("e1") ? Move(move_list[(round - 1) * 2]) : Move(move_list[(round - 1) * 2 + 1]);
 }
 
+Move IA_linear::getNextMove(const unsigned int round, const Board & board, const std::vector<PawnPosition>& pawns, const std::vector<WallPosition>& walls) const
+{
+    if (round == 1)
+        std::cout << name() << " is playing his first move with 'IA_linear'." << std::endl;
+
+    if ((2 * round) > move_list_.size())
+        return Move();
+    else
+        return startPosition() == BoardPosition("e1") ? Move(move_list_[(round - 1) * 2]) : Move(move_list_[(round - 1) * 2 + 1]);
+}

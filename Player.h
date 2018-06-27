@@ -42,3 +42,11 @@ private:
     std::vector<BoardPosition> arrivalPosition_;
 };
 
+class IA_linear : public Player
+{
+public:
+    IA_linear(const PlayerName &n, const Color &c, const BoardPosition &sp, std::vector<std::string> &moves) : Player(n, c, sp), move_list_{ moves } {}
+    Move getNextMove(const unsigned int round, const Board &board, const std::vector<PawnPosition>& pawns, const std::vector<WallPosition>& walls) const;
+private:
+    std::vector<std::string> move_list_;
+};
