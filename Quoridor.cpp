@@ -36,6 +36,21 @@ void test_Game()
     };
 
     {
+        auto ia1 = new IA_random_pawn("*IA_1: Player 1*", Player::Color::black, BoardPosition("e1"));
+        auto ia2 = new IA_random_pawn("*IA_1: Player 2*", Player::Color::white, BoardPosition("e9"));
+        test("Test Random pawn 1", ia1, ia2);
+        delete ia1, ia2;
+    }
+
+    {
+        auto ia1 = new IA_random_wall_pawn("*IA_1: Player 1*", Player::Color::black, BoardPosition("e1"));
+        auto ia2 = new IA_random_wall_pawn("*IA_1: Player 2*", Player::Color::white, BoardPosition("e9"));
+        test("Test Random wall/pawn 1", ia1, ia2);
+        delete ia1, ia2;
+    }
+    return;
+
+    {
         // https://quoridorstrats.files.wordpress.com/2014/09/game-full-with-notation1.png
         //   Only legal moves.
         std::vector<std::string> move_list{

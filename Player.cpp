@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <random>
 
 Player::Player(const PlayerName & name, const Color & color, const BoardPosition & startPosition) :
     name_{ name }, color_{ color }, walls_{ 10 }, startPosition_{ startPosition }, arrivalPosition_{}
@@ -40,4 +41,43 @@ Move IA_linear::getNextMove(const unsigned int round, const Board & board, const
         return Move();
     else
         return startPosition() == BoardPosition("e1") ? Move(move_list_[(round - 1) * 2]) : Move(move_list_[(round - 1) * 2 + 1]);
+}
+
+Move IA_random_pawn::getNextMove(const unsigned int round, const Board & board, const std::vector<PawnPosition>& pawns, const std::vector<WallPosition>& walls) const
+{
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937_64 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<int> dis(1, 5); // 5 moves max for pawn
+
+    auto random = dis(gen);
+    while (random > pawns.size())
+        random = dis(gen);
+    //std::cout << random << " ";
+    return pawns[random - 1];
+}
+
+Move IA_random_wall_pawn::getNextMove(const unsigned int round, const Board & board, const std::vector<PawnPosition>& pawns, const std::vector<WallPosition>& walls) const
+{
+    std::random_device rd;  //Will be used to obtain a seed for the random number engine
+    std::mt19937_64 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<int> dis_5(1, 5); // 5 moves max for pawn
+    std::uniform_int_distribution<int> dis_128(1, 128); // 5 moves max for pawn
+    std::bernoulli_distribution dis_bool(0.5); // Bool 50% true
+
+    if (dis_bool(gen) || walls.empty())
+    {
+        auto random = dis_5(gen);
+        while (random > pawns.size())
+            random = dis_5(gen);
+        //std::cout << random << " ";
+        return pawns[random - 1];
+    }
+    else
+    {
+        auto random = dis_128(gen);
+        while (random > walls.size())
+            random = dis_128(gen);
+        //std::cout << random << " ";
+        return walls[random - 1];
+    }
 }

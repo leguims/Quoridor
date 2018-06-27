@@ -50,3 +50,17 @@ public:
 private:
     std::vector<std::string> move_list_;
 };
+
+class IA_random_pawn : public Player
+{
+public:
+    IA_random_pawn(const PlayerName &n, const Color &c, const BoardPosition &sp) : Player(n, c, sp) {}
+    Move getNextMove(const unsigned int round, const Board &board, const std::vector<PawnPosition>& pawns, const std::vector<WallPosition>& walls) const;
+};
+
+class IA_random_wall_pawn : public Player
+{
+public:
+    IA_random_wall_pawn(const PlayerName &n, const Color &c, const BoardPosition &sp) : Player(n, c, sp) {}
+    Move getNextMove(const unsigned int round, const Board &board, const std::vector<PawnPosition>& pawns, const std::vector<WallPosition>& walls) const;
+};
