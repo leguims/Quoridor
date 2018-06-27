@@ -65,6 +65,11 @@ void Board::registerHandler(const handlerCB &&handler)
 
 PawnPosition& Board::getPawnNonConst(const PlayerName& name)
 {
+    return const_cast<PawnPosition&>(static_cast<const Board&>(*this).getPawn(name));
+}
+
+const PawnPosition & Board::getPawn(const PlayerName& name) const
+{
     // Find player by name in vector
     auto player = std::find_if(pawnsPosition_.begin(), pawnsPosition_.end(),
         [name](const PawnPosition &p)->bool { return (p.playerName() == name); });
@@ -73,11 +78,6 @@ PawnPosition& Board::getPawnNonConst(const PlayerName& name)
         throw std::out_of_range("Player " + name + " unknown");
 
     return *player;
-}
-
-const PawnPosition & Board::getPawn(const PlayerName& name) const
-{
-    return (const_cast<Board*>(this))->getPawnNonConst(name);
 }
 
 bool Board::existsWall(const WallPosition & wall) const
