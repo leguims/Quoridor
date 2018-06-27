@@ -41,23 +41,9 @@ void Game::move()
     auto current_name = current_player->name();
     auto move = current_player->getNextMove(round, *board_, referee_.getValidPawns(current_name), referee_.getValidWalls(current_name));
     move.playerName(current_name);
+
     if (referee_.ValidMove(move))
     {
-        if (index_player_ == 0)
-        {
-            // Save player 1 (and "none" for player 2)
-            moveList_.emplace_back(std::make_pair(move, Move()));
-        }
-        else if (index_player_ == 1)
-        {
-            // Save player 2
-            moveList_.at(round - 1).second = move;
-        }
-        else
-        {
-            throw std::out_of_range("Unexpected player " + index_player_);
-        }
-
         // Add move to the board
         board_->add(move);
 
@@ -71,12 +57,29 @@ void Game::move()
     }
     else
     {
-        if (move.type() == Move::Type::none)
+        inGame = false;
+        move.setIllegal();
+        referee_.illegalMove(current_name);
+        if (move.type() == Move::Type::surrend)
             std::cout << "Round " << round << " : " << current_name << " does not play and surrenders, game is over." << std::endl;
         else
             std::cout << "Round " << round << " : " << current_name << " plays invalid move (" << move << "), game is over." << std::endl;
-        inGame = false;
-        referee_.illegalMove(current_name);
+    }
+
+    // Add move to list
+    if (index_player_ == 0)
+    {
+        // Save player 1 (and "none" for player 2)
+        moveList_.emplace_back(std::make_pair(move, Move()));
+    }
+    else if (index_player_ == 1)
+    {
+        // Save player 2
+        moveList_.at(round - 1).second = move;
+    }
+    else
+    {
+        throw std::out_of_range("Unexpected player " + index_player_);
     }
 }
 

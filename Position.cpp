@@ -230,6 +230,22 @@ const Move::Type& Move::type(const std::string & text)
     return type_;
 }
 
+void Move::setIllegal()
+{
+    switch (type_)
+    {
+    case Move::Type::pawn:
+        type_ = Move::Type::illegal_pawn;
+        break;
+    case Move::Type::wall:
+        type_ = Move::Type::illegal_wall;
+        break;
+    case Move::Type::none:
+        type_ = Move::Type::surrend;
+        break;
+    }
+}
+
 const int Position::x(const std::string& text)
 {
     if (text.size() != 1)

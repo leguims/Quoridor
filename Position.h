@@ -280,7 +280,7 @@ inline bool operator!=(const WallPosition& lhs, const WallPosition& rhs) { retur
 class Move
 {
 public:
-    enum class Type { pawn, wall, none };
+    enum class Type { pawn, wall, illegal_pawn, illegal_wall, surrend, none };
     Move() noexcept : type_{ Type::none }, player_{}, wall_{} {}
     Move(const PawnPosition &player) : type_{ Type::pawn }, player_{ player }, wall_{} {}
     Move(const WallPosition &wall) : type_{ Type::wall }, player_{}, wall_{ wall } {}
@@ -288,6 +288,7 @@ public:
 
     void restore(const std::string &move);
     const Type& type(const std::string &text);
+    void setIllegal();
     const Type& type() const { return type_; }
     void playerName(const PlayerName& playerName) { player_.playerName(playerName); }
     const PawnPosition& pawn() const { return player_; }
@@ -302,6 +303,15 @@ public:
             break;
         case Move::Type::wall:
             out << move.wall_;
+            break;
+        case Move::Type::illegal_pawn:
+            out << (BoardPosition)move.player_ << "(illegal)"; // casted to mask player name
+            break;
+        case Move::Type::illegal_wall:
+            out << move.wall_ << "(illegal)";
+            break;
+        case Move::Type::surrend:
+            out << "(resigns)";
             break;
         }
         return out;
