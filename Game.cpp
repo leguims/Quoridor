@@ -3,6 +3,8 @@
 #include <string>
 #include <memory>
 
+constexpr int MAX_ROUND = 130;
+
 void Game::chooseReferee()
 {
     // choose referee, means rules.
@@ -36,6 +38,11 @@ void Game::move()
     index_player_ = ++index_player_ % players_->size();
     auto round = (index_player_ == 0 ? moveList_.size() + 1 : moveList_.size());
     //std::cout << "Round = " << round << std::endl;
+    if (round >= MAX_ROUND)
+    {
+        inGame = false;
+        return;
+    }
 
     auto& current_player = players_->at(index_player_);
     auto current_name = current_player->name();

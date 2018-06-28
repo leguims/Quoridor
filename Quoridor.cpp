@@ -6,17 +6,19 @@
 #include "Game.h"
 
 void test_BoardPosition();
-void test_Game();
+void test_Game_IA_linear();
+void test_Game_IA_random();
 
 int main()
 {
     test_BoardPosition();
-    test_Game();
+    test_Game_IA_linear();
+    test_Game_IA_random();
 
     return 0;
 }
 
-void test_Game()
+void test_Game_IA_random()
 {
     auto test = [](std::string title, Player *p1, Player *p2) {
         std::cout << "test_Game(" << title << ") : START" << std::endl;
@@ -48,7 +50,26 @@ void test_Game()
         test("Test Random wall/pawn 1", ia1, ia2);
         delete ia1, ia2;
     }
-    return;
+}
+
+void test_Game_IA_linear()
+{
+    auto test = [](std::string title, Player *p1, Player *p2) {
+        std::cout << "test_Game(" << title << ") : START" << std::endl;
+        Game game;
+
+        game.chooseReferee();
+        game.choosePlayers(p1, p2);
+        game.launch();
+
+        while (game.getResult() == Game::Result::inProgress)
+            game.move();
+
+        //game.save();
+        std::cout << game;
+        std::cout << "Game result : " << game.getResult() << std::endl;
+        std::cout << "test_Game(" << title << ") : END\n\n";
+    };
 
     {
         // https://quoridorstrats.files.wordpress.com/2014/09/game-full-with-notation1.png

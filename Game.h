@@ -89,4 +89,3 @@ private:
     bool inGame;
     int index_player_;
 };
-
