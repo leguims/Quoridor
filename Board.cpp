@@ -11,7 +11,7 @@ Board::~Board()
 {
 }
 
-void Board::add(const PawnPosition & pawn)
+void Board::add(PawnPosition pawn)
 {
     try
     {
@@ -56,6 +56,7 @@ void Board::add(const Move & move)
     default:
         throw std::out_of_range("Unknown move to add to the board");
     }
+    std::cout << "Board status : \n" << *this << std::endl;
 }
 
 void Board::registerHandler(const handlerCB &&handler)

@@ -41,8 +41,8 @@ public:
     Game() noexcept : board_{ std::make_shared<Board>() }, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
     ~Game() = default;
     void chooseReferee();
-    void choosePlayers(Player * const p1 = new Player{ "Player 1", Player::Color::black, BoardPosition("e1") },
-        Player * const p2 = new Player{ "Player 2", Player::Color::red, BoardPosition("e9") });
+    void choosePlayers(Player * const p1 = new Player{ "Player 1",Color::black, BoardPosition("e1") },
+        Player * const p2 = new Player{ "Player 2",Color::red, BoardPosition("e9") });
     void launch();
     void move();
     //void save();

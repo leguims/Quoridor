@@ -31,6 +31,63 @@ public:
     void width(const int value) { width_ = value; }
     void heigth(const int value) { heigth_ = value; }
 
+    friend std::ostream& operator<<(std::ostream& out, const Board& board)
+    {
+        std::vector<std::string> board_str = {
+            //000000000011111111112
+            //012345678901234567890
+            "  a b c d e f g h i  ",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "9| | | | | | | | | |9",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "8| | | | | | | | | |8",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "7| | | | | | | | | |7",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "6| | | | | | | | | |6",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "5| | | | | | | | | |5",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "4| | | | | | | | | |4",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "3| | | | | | | | | |3",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "2| | | | | | | | | |2",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "1| | | | | | | | | |1",
+            " +-+-+-+-+-+-+-+-+-+ ",
+            "  a b c d e f g h i  "
+        };
+
+        for (const auto& p : board.pawns())
+        {
+            std::ostringstream oss;
+            oss << p.color();
+            board_str[20 - 2 * p.y()][2 * p.x()] = oss.str().c_str()[0]; // oss => string => char* => char
+        }
+
+        for (const auto& w : board.walls())
+        {
+            if (w.direction() == WallPosition::Direction::vertical)
+            {
+                board_str[20 - 2 * w.y() - 0][2 * w.x() + 1] = '#';
+                board_str[20 - 2 * w.y() - 1][2 * w.x() + 1] = '#';
+                board_str[20 - 2 * w.y() - 2][2 * w.x() + 1] = '#';
+            }
+            else
+            {
+                board_str[20 - 2 * w.y() - 1][2 * w.x() + 0] = '#';
+                board_str[20 - 2 * w.y() - 1][2 * w.x() + 1] = '#';
+                board_str[20 - 2 * w.y() - 1][2 * w.x() + 2] = '#';
+            }
+        }
+
+        for (const auto& l : board_str)
+            out << l << "\n";
+
+        return out;
+    }
+
 private:
     int width_;
     int heigth_;
@@ -39,7 +96,7 @@ private:
     std::vector<handlerCB> handlers_;
 
     PawnPosition& getPawnNonConst(const PlayerName& name);
-    void add(const PawnPosition & pawn);
+    void add(PawnPosition pawn);
     void add(const WallPosition & wall);
     void callHandlers();
 };

@@ -46,7 +46,7 @@ void Referee::launch()
     // Initialize start position for players
     for (const auto& p : *players_)
     {
-        Move move = PawnPosition(p->startPosition(), p->name());
+        Move move = PawnPosition(p->startPosition(), p->name(), p->color());
         board_->add(move);
     }
     illegalMove_.clear(); // No illegal move

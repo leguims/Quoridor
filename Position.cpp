@@ -193,6 +193,17 @@ bool WallPosition::validY(const int y)
     return ((1 <= y) && (y <= 8));
 }
 
+PawnPosition & PawnPosition::operator=(const PawnPosition &pawn)
+{
+    x(pawn.x());
+    y(pawn.y());
+    playerName_ = pawn.playerName_;
+    if (pawn.color_ != Color::none) // Do not copy if empty
+        color_ = pawn.color_;
+
+    return *this;
+}
+
 void PawnPosition::restore(const std::string &text)
 {
     BoardPosition::restore(text);

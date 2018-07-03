@@ -153,14 +153,16 @@ class PawnPosition : public BoardPosition
 {
 public:
     PawnPosition() = default;
-    PawnPosition(const BoardPosition& position, const PlayerName& playerName) : BoardPosition{ position }, playerName_{ playerName } {}
-    PawnPosition(const unsigned int x, const unsigned int y, const PlayerName& playerName) : BoardPosition{ x, y }, playerName_{ playerName } {}
-    PawnPosition(const std::string & playerPosition, const PlayerName& playerName = "") : BoardPosition(playerPosition.substr(0, 2)), playerName_(playerName) {}
+    PawnPosition(const BoardPosition& position, const PlayerName& playerName, const Color& color = Color::none) : BoardPosition{ position }, playerName_{ playerName }, color_{ color } {}
+    PawnPosition(const unsigned int x, const unsigned int y, const PlayerName& playerName, const Color& color = Color::none) : BoardPosition{ x, y }, playerName_{ playerName }, color_{ color } {}
+    PawnPosition(const std::string & playerPosition, const PlayerName& playerName = "", const Color& color = Color::none) : BoardPosition(playerPosition.substr(0, 2)), playerName_(playerName), color_{ color } {}
     ~PawnPosition() = default;
-    PawnPosition& operator=(const PawnPosition&) = default;
+    PawnPosition& operator=(const PawnPosition&);
 
     void playerName(const PlayerName& playerName) { playerName_ = playerName; }
     const PlayerName& playerName() const { return playerName_; }
+    void color(const Color& color) { color_ = color; }
+    const Color& color() const { return color_; }
     void restore(const std::string&) override;
     void restore(const std::string&, const PlayerName&);
 
@@ -174,6 +176,7 @@ public:
 
 private:
     PlayerName playerName_;
+    Color color_;
 };
 
 

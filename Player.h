@@ -10,7 +10,7 @@
 class Player
 {
 public:
-    enum class Color { red, blue, white, black };
+
 
 public:
     Player() = default;
@@ -18,6 +18,7 @@ public:
     Player& operator=(const Player&) = default;
     virtual ~Player() = default;
     const PlayerName& name() const { return name_; }
+    const Color& color() const { return color_; }
     const BoardPosition& startPosition() const { return startPosition_; }
     const std::vector<BoardPosition>& arrivalPosition() const { return arrivalPosition_; }
 
