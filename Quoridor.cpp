@@ -156,6 +156,19 @@ void test_Game_IA_linear()
     {
         std::vector<std::string> move_list{
             "e2", "e8",
+            "b5v", "b6v",  // Illegal b6v, wall cannot use b6v twice !
+            "e3", "e7",
+        };
+
+        auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
+        auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
+        test("Test 5", ia1, ia2);
+        delete ia1, ia2;
+    }
+
+    {
+        std::vector<std::string> move_list{
+            "e2", "e8",
             "e3", "e7",
             "e4", "e6",
             "e5", "e5", // Illegal move, e5 is not empty.

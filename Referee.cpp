@@ -85,10 +85,32 @@ bool Referee::ValidWall(const WallPosition &wall) const
     // Check range of walls ==> Already done in 'WallPosition'
 
     // Check if wall is already on board or crosses another wall
-    auto crossedWall = wall;
-    crossedWall.direction(wall.oppositeDirection());
-    if (board_->existsWall(wall) or board_->existsWall(crossedWall))
-        return false;
+    auto crossed = wall;
+    crossed.direction(wall.oppositeDirection());
+    std::vector<WallPosition> badWalls;
+    badWalls.push_back(wall);
+    badWalls.push_back(crossed);
+    if (wall.direction() == WallPosition::Direction::horizontal)
+    {
+        try { badWalls.push_back(wall + Position{ -1,0 }); }
+        catch (std::out_of_range) {}
+
+        try { badWalls.push_back(wall + Position{ 1,0 }); }
+        catch (std::out_of_range) {}
+    }
+    else
+    {
+        try { badWalls.push_back(wall + Position{ 0,-1 }); }
+        catch (std::out_of_range) {}
+
+        try { badWalls.push_back(wall + Position{ 0,1 }); }
+        catch (std::out_of_range) {}
+    }
+    for (const auto& w : badWalls)
+    {
+        if (board_->existsWall(w))
+            return false;
+    }
 
     // Check if wall close the path to arrival
     for (const auto& p : *players_)
