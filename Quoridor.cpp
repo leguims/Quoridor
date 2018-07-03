@@ -168,6 +168,22 @@ void test_Game_IA_linear()
 
     {
         std::vector<std::string> move_list{
+            "f1", "h5v",
+            "e3h", "b8v",
+            "d4v", "d9",
+            "a4h", "c9",
+            "g1", "b9",  // Illegal b9, cannot jump over the wall b8v !
+            "f1", "c9",
+        };
+
+        auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
+        auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
+        test("Test 6", ia1, ia2);
+        delete ia1, ia2;
+    }
+
+    {
+        std::vector<std::string> move_list{
             "e2", "e8",
             "e3", "e7",
             "e4", "e6",

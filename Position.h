@@ -192,7 +192,7 @@ public:
     WallPosition(const int x, const int y, const Direction& direction) : BoardPosition(x, y), direction_(direction) {}
     WallPosition(const int x, const int y, const std::string& text) : BoardPosition(x, y), direction_(direction(text)) {}
     WallPosition(const std::string & wallPosition) : BoardPosition(wallPosition.substr(0, 2)), direction_(direction(wallPosition.substr(2, 1))) {}
-    WallPosition(const BoardPosition& a, const BoardPosition& b);
+    WallPosition(const BoardPosition&, const BoardPosition&, const bool);
     ~WallPosition() = default;
     WallPosition& operator=(const WallPosition&) = default;
 

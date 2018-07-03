@@ -406,28 +406,14 @@ std::vector<WallPosition> Referee::findBlockerWalls(const BoardPosition &current
     {
         // Pawn moves to next case
         // Find each possible walls between the 2 pawns
-        auto wall1 = WallPosition{};
-        try
+        for (const auto primary : { true, false })
         {
-            wall1 = WallPosition(next, current);
-            list.emplace_back(wall1);
-
             try
             {
-                auto wall2 = wall1;
-                if (wall1.direction() == WallPosition::Direction::horizontal)
-                    wall2 += Position(-1, 0);
-                else if (wall1.direction() == WallPosition::Direction::vertical)
-                    wall2 += Position(0, -1);
-
-                list.emplace_back(wall2);
+                auto wall = WallPosition(next, current, primary);
+                list.emplace_back(wall);
             }
-            catch (const std::out_of_range &) {} // Wall2 is out of board : ignore it
-        }
-        catch (const std::out_of_range &)
-        {
-            // wall1 created is out of board, so return "wall2" instead.
-            list.emplace_back(wall1);
+            catch (const std::out_of_range &) {} // Wall is out of board : ignore it
         }
     }
     else if (length > 1)
