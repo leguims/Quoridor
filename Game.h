@@ -37,26 +37,36 @@ public:
         return out;
     }
 
+    struct notation{
+        std::string date;
+        std::string rules;
+        std::vector<std::string> players;
+        int rounds;
+        std::string result;
+        std::vector<std::string> moves;
+        operator Game() const;
+    };
+    operator notation() const;
+
+
 public:
     Game() noexcept : board_{ std::make_shared<Board>() }, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
     ~Game() = default;
     void chooseReferee();
-    void choosePlayers(Player * const p1 = new Player{ "Player 1",Color::black, BoardPosition("e1") },
-        Player * const p2 = new Player{ "Player 2",Color::red, BoardPosition("e9") });
+    void choosePlayers(Player * const p1, Player * const p2);
     void launch();
     void move();
-    //void save();
+    std::string save();
     Result getResult() const;
     const Referee& referee() const { return referee_; }
+    void add(const Move &);
 
     friend std::ostream& operator<<(std::ostream& out, const Game& game)
     {
         // Save to file the game.
 
-        auto now = std::chrono::system_clock::now();
-        auto in_time_t = std::chrono::system_clock::to_time_t(now);
-#pragma warning(suppress : 4996) // to use std::localtime() deprecated
-        out << "Date : " << std::put_time(std::localtime(&in_time_t), "%d/%m/%Y %H:%M:%S") << std::endl;
+        out << "Date : " << game.date() << std::endl;
+        //out << "Filename : " << game.filename() << std::endl;
 
         out << "Rules : " << game.referee_ << std::endl;
 
@@ -88,4 +98,6 @@ private:
 
     bool inGame;
     int index_player_;
+    std::string date() const;
+    std::string filename() const;
 };

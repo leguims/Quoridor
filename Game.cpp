@@ -1,9 +1,46 @@
 #include "Game.h"
+
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <memory>
 
+#include "json/single_include/nlohmann/json.hpp"
+using json = nlohmann::json;
+
 constexpr int MAX_ROUND = 130;
+
+Game::operator notation() const
+{
+    notation n;
+    std::ostringstream oss;
+
+    n.date = date();
+
+    oss.str(""); oss << referee_;
+    n.rules = oss.str();
+
+    for (const auto &player : *players_)
+    {
+        n.players.push_back(player->name());
+    }
+
+    n.rounds = moveList_.size();
+
+    oss.str(""); oss << getResult();
+    n.result = oss.str();
+
+    for (const auto &movePair : moveList_)
+    {
+        for (const auto &move : { movePair.first, movePair.second })
+        {
+            oss.str(""); oss << move;
+            n.moves.push_back(oss.str());
+        }
+    }
+
+    return n;
+}
 
 void Game::chooseReferee()
 {
@@ -90,17 +127,35 @@ void Game::move()
     }
 }
 
-//void Game::save()
-//{
-//    // Save to file the game.
-//    std::cout << "Game moves : " << std::endl;
-//    auto index = 1;
-//    for (const auto &move : moveList_)
-//    {
-//        std::cout << index << "." << move.first << "\t" << move.second << std::endl;
-//    }
-//    std::cout << "Game saved." << std::endl;
-//}
+void to_json(json& j, const Game::notation& g) {
+    j = json{ { "Date", g.date },
+    { "Rules", g.rules },
+    { "Players", g.players },
+    { "Rounds", g.rounds },
+    { "Result", g.result },
+    { "moves", g.moves },
+    };
+}
+
+void from_json(const json& j, Game::notation& g) {
+    g.date = j.at("Date").get<std::string>();
+    g.rules = j.at("Rules").get<std::string>();
+    g.players = j.at("Players").get<std::vector<std::string>>();
+    g.result = j.at("Rounds").get<int>();
+    g.result = j.at("Result").get<std::string>();
+    g.moves = j.at("moves").get<std::vector<std::string>>();
+}
+
+std::string Game::save()
+{
+    auto _filename = filename() + ".json";
+
+    std::ofstream o(_filename);
+    json j = *this;
+    o << std::setw(4) << j << std::endl;
+
+    return _filename;
+}
 
 Game::Result Game::getResult() const
 {
@@ -112,4 +167,67 @@ Game::Result Game::getResult() const
         return Game::Result::win2;
     else
         return Game::Result::draw;
+}
+
+void Game::add(const Move &move)
+{
+    if (moveList_.empty() || moveList_.rbegin()->second.type() != Move::Type::none)
+        moveList_.emplace_back(std::make_pair(move, Move()));
+    else
+        moveList_.rbegin()->second = move;
+}
+
+std::string Game::filename() const
+{
+    std::string _filename;
+
+    for (const auto &player : *players_)
+    {
+        _filename += player->name() + "_";
+    }
+    _filename += date();
+
+    for (const auto& forbidden : { ':', '/' })
+        std::replace(_filename.begin(), _filename.end(), forbidden, '-');
+
+    for (const auto& forbidden : { ' ', '?', '*' })
+        std::replace(_filename.begin(), _filename.end(), forbidden, '_');
+
+    return _filename;
+}
+
+std::string Game::date() const
+{
+    std::ostringstream oss;
+
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+#pragma warning(suppress : 4996) // to use std::localtime() deprecated
+    oss << std::put_time(std::localtime(&in_time_t), "%d/%m/%Y %H:%M:%S");
+
+    return oss.str();
+}
+
+Game::notation::operator Game() const
+{
+    Game g;
+
+    //g.??? = date;
+
+    //g.??? = rules;
+
+    //g.players_ = players
+    auto p1 = new Player(players.at(0), Color::black, BoardPosition("e1"));
+    auto p2 = new Player(players.at(1), Color::white, BoardPosition("e9"));
+    g.choosePlayers(p1, p2);
+
+    // g.??? = result;
+
+    // g.moveList_ = moves
+    for (const auto &move : moves)
+    {
+        g.add(move);
+    }
+
+    return g;
 }

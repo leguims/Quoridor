@@ -36,6 +36,7 @@ void test_Game_IA_random()
         //game.save();
         std::cout << game;
         std::cout << "Game result : " << game.getResult() << std::endl;
+        std::cout << "Save game to file : " << game.save() << std::endl;
         std::cout << "test_Game(" << title << ") : END\n\n";
     };
 
