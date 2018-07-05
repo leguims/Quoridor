@@ -1,3 +1,6 @@
 [submodule "a-star"]
 	path = a-star
 	url = https://github.com/leguims/a-star
+[submodule "json"]
+	path = json
+	url = https://github.com/nlohmann/json
