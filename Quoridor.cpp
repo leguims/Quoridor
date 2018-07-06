@@ -33,7 +33,6 @@ void test_Game_IA_random()
         while (game.getResult() == Game::Result::inProgress)
             game.move();
 
-        //game.save();
         std::cout << game;
         std::cout << "Game result : " << game.getResult() << std::endl;
         std::cout << "Save game to file : " << game.save() << std::endl;
@@ -41,15 +40,15 @@ void test_Game_IA_random()
     };
 
     {
-        auto ia1 = new IA_random_pawn("*IA_1: Player 1*", Color::black, BoardPosition("e1"));
-        auto ia2 = new IA_random_pawn("*IA_1: Player 2*", Color::white, BoardPosition("e9"));
+        auto ia1 = new IA_random_pawn("IA_random_pawn.1", Color::black, BoardPosition("e1"));
+        auto ia2 = new IA_random_pawn("IA_random_pawn.2", Color::white, BoardPosition("e9"));
         test("Test Random pawn 1", ia1, ia2);
         delete ia1, ia2;
     }
 
     {
-        auto ia1 = new IA_random_wall_pawn("*IA_1: Player 1*", Color::black, BoardPosition("e1"));
-        auto ia2 = new IA_random_wall_pawn("*IA_1: Player 2*", Color::white, BoardPosition("e9"));
+        auto ia1 = new IA_random_wall_pawn("IA_random_wall_pawn.1", Color::black, BoardPosition("e1"));
+        auto ia2 = new IA_random_wall_pawn("IA_random_wall_pawn.2", Color::white, BoardPosition("e9"));
         test("Test Random wall/pawn 1", ia1, ia2);
         delete ia1, ia2;
     }
@@ -68,7 +67,6 @@ void test_Game_IA_linear()
         while (game.getResult() == Game::Result::inProgress)
             game.move();
 
-        //game.save();
         std::cout << game;
         std::cout << "Game result : " << game.getResult() << std::endl;
         std::cout << "test_Game(" << title << ") : END\n\n";

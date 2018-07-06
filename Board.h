@@ -13,7 +13,7 @@ public:
     using handlerCB = std::function<void(void)>;
 
     Board() noexcept;
-    Board(int width, int height) noexcept : width_{ width }, heigth_{ height } {}
+    Board(int width, int height) noexcept : width_{ width }, heigth_{ height }, showMoves_{ false } {}
     ~Board();
 
     void add(const Move & move);
@@ -30,6 +30,7 @@ public:
     const int heigth() const { return heigth_; }
     void width(const int value) { width_ = value; }
     void heigth(const int value) { heigth_ = value; }
+    void showMoves(const bool show) { showMoves_ = show; }
 
     friend std::ostream& operator<<(std::ostream& out, const Board& board)
     {
@@ -98,6 +99,7 @@ private:
     std::vector<PawnPosition> pawnsPosition_;
     std::vector<WallPosition> wallsPosition_;
     std::vector<handlerCB> handlers_;
+    bool showMoves_;
 
     PawnPosition& getPawnNonConst(const PlayerName& name);
     void add(PawnPosition pawn);

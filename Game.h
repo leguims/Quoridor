@@ -60,6 +60,7 @@ public:
     Result getResult() const;
     const Referee& referee() const { return referee_; }
     void add(const Move &);
+    void showMoves(const bool show) { board_->showMoves(show); }
 
     friend std::ostream& operator<<(std::ostream& out, const Game& game)
     {
