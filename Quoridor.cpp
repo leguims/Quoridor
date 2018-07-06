@@ -2,6 +2,10 @@
 //
 
 #include <iostream>
+#include <thread>
+
+// #define NDEBUG
+#include <cassert>
 
 #include "Game.h"
 
@@ -17,18 +21,30 @@ int main()
     test_Game_IA_linear();
     test_Game_IA_random();
 
+    {
+        using namespace std::chrono_literals;
+        std::cout << "End in ";
+        for (auto i = 5; i > 0; --i)
+        {
+            std::cout << i << " ";
+            std::this_thread::sleep_for(1s);
+        }
+    }
+
     return 0;
 }
 
 void test_Game_IA_random()
 {
-    auto test = [](std::string title, Player *p1, Player *p2) {
+    auto test = [](std::string title, Player *p1, Player *p2, bool showMoves) {
         std::cout << "test_Game(" << title << ") : START" << std::endl;
         Game game;
 
         game.chooseReferee();
         game.choosePlayers(p1, p2);
+        game.showMoves(showMoves);
         game.launch();
+        assert(game.getResult() == Game::Result::inProgress);
 
         while (game.getResult() == Game::Result::inProgress)
             game.move();
@@ -42,31 +58,34 @@ void test_Game_IA_random()
     {
         auto ia1 = new IA_random_pawn("IA_random_pawn.1", Color::black, BoardPosition("e1"));
         auto ia2 = new IA_random_pawn("IA_random_pawn.2", Color::white, BoardPosition("e9"));
-        test("Test Random pawn 1", ia1, ia2);
+        test("Test Random pawn 1", ia1, ia2, false);
         delete ia1, ia2;
     }
 
     {
         auto ia1 = new IA_random_wall_pawn("IA_random_wall_pawn.1", Color::black, BoardPosition("e1"));
         auto ia2 = new IA_random_wall_pawn("IA_random_wall_pawn.2", Color::white, BoardPosition("e9"));
-        test("Test Random wall/pawn 1", ia1, ia2);
+        test("Test Random wall/pawn 1", ia1, ia2, false);
         delete ia1, ia2;
     }
 }
 
 void test_Game_IA_linear()
 {
-    auto test = [](std::string title, Player *p1, Player *p2) {
+    auto test = [](std::string title, Player *p1, Player *p2, Game::Result result, bool showMoves = false) {
         std::cout << "test_Game(" << title << ") : START" << std::endl;
         Game game;
 
         game.chooseReferee();
         game.choosePlayers(p1, p2);
+        game.showMoves(showMoves);
         game.launch();
+        assert(game.getResult() == Game::Result::inProgress);
 
         while (game.getResult() == Game::Result::inProgress)
             game.move();
 
+        assert(game.getResult() == result);
         std::cout << game;
         std::cout << "Game result : " << game.getResult() << std::endl;
         std::cout << "test_Game(" << title << ") : END\n\n";
@@ -89,7 +108,7 @@ void test_Game_IA_linear()
 
         auto ia1 = new IA_linear("*IA_1: Player 1*", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("*IA_1: Player 2*", Color::white, BoardPosition("e9"), move_list);
-        test("Test 1", ia1, ia2);
+        test("Test 1", ia1, ia2, Game::Result::win2);
         delete ia1, ia2;
     }
 
@@ -110,7 +129,7 @@ void test_Game_IA_linear()
 
         auto ia1 = new IA_linear("*Player 1*", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("*Player 2*", Color::white, BoardPosition("e9"), move_list);
-        test("Test 2", ia1, ia2);
+        test("Test 2", ia1, ia2, Game::Result::win2);
         delete ia1, ia2;
     }
 
@@ -129,7 +148,7 @@ void test_Game_IA_linear()
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test 3", ia1, ia2);
+        test("Test 3", ia1, ia2, Game::Result::win2);
         delete ia1, ia2;
     }
 
@@ -148,7 +167,7 @@ void test_Game_IA_linear()
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test 4", ia1, ia2);
+        test("Test 4", ia1, ia2, Game::Result::win2);
         delete ia1, ia2;
     }
 
@@ -161,7 +180,7 @@ void test_Game_IA_linear()
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test 5", ia1, ia2);
+        test("Test 5", ia1, ia2, Game::Result::win1);
         delete ia1, ia2;
     }
 
@@ -177,7 +196,7 @@ void test_Game_IA_linear()
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test 6", ia1, ia2);
+        test("Test 6", ia1, ia2, Game::Result::win1);
         delete ia1, ia2;
     }
 
@@ -192,7 +211,7 @@ void test_Game_IA_linear()
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test Cyprien 1", ia1, ia2);
+        test("Test Cyprien 1", ia1, ia2, Game::Result::win1);
         delete ia1, ia2;
     }
 
@@ -202,14 +221,14 @@ void test_Game_IA_linear()
             "e3", "e7",
             "e4", "e6",
             "e5", "e5v",
-            "c6h", "d6h",
-            "f6", "e5",  // Illegal move, e5 is not empty.
+            "c6h", "d6h",  // Illegal d6h, wall cannot use d6h twice !
+            "f6", "e5",
             "f7", "e4",
         };
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test Cyprien 2", ia1, ia2);
+        test("Test Cyprien 2", ia1, ia2, Game::Result::win1);
         delete ia1, ia2;
     }
 
@@ -221,7 +240,7 @@ void test_Game_IA_linear()
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test Cyprien 3", ia1, ia2);
+        test("Test Cyprien 3", ia1, ia2, Game::Result::win1);
         delete ia1, ia2;
     }
 }
@@ -232,38 +251,50 @@ void test_BoardPosition()
     {
         BoardPosition position(5, 9);
         std::cout << "Position : " << position << std::endl;
+        assert(BoardPosition(5, 9) == position);
     }
 
     {
         BoardPosition position("e1");
         std::cout << "Position : " << position << std::endl;
+        assert(BoardPosition(5, 1) == position);
     }
 
     {
         PawnPosition pawnPosition(5, 9, "Gerard");
         std::cout << "PawnPosition : " << pawnPosition << std::endl;
+        assert(BoardPosition(5, 9) == pawnPosition);
+        assert("Gerard" == pawnPosition.playerName());
     }
 
     {
         WallPosition wallPosition(5, 9, WallPosition::Direction::horizontal);
         std::cout << "WallPosition : " << wallPosition << std::endl;
+        assert(BoardPosition(5, 9) == wallPosition);
+        assert(WallPosition::Direction::horizontal == wallPosition.direction());
     }
 
     {
-        WallPosition wallPosition2(6, 8, "v");
-        std::cout << "WallPosition2 : " << wallPosition2 << std::endl;
+        WallPosition wallPosition(6, 8, "v");
+        std::cout << "WallPosition2 : " << wallPosition << std::endl;
+        assert(BoardPosition(6, 8) == wallPosition);
+        assert(WallPosition::Direction::vertical == wallPosition.direction());
     }
     std::cout << "test_BoardPosition() : END\n\n";
 }
 
 void test_Board()
 {
+    std::cout << "test_Board() : START\n\n";
     {
         Board board;
 
         Move michou = PawnPosition(5, 1, "Michou", Color::black); board.add(michou);
         michou = PawnPosition(5, 2, "Michou"); board.add(michou);
         Move gerard = PawnPosition(5, 9, "Gerard", Color::white); board.add(gerard);
+        assert(board.pawns().size() == 2);
+        assert(board.existsPawn({ 5, 2 }));
+        assert(board.existsPawn({ 5, 9 }));
 
         Move wallPosition1 = WallPosition(1, 8, "h"); board.add(wallPosition1);
         Move wallPosition2 = WallPosition(1, 1, "h"); board.add(wallPosition2);
@@ -271,8 +302,16 @@ void test_Board()
         Move wallPosition4 = WallPosition(5, 1, "v"); board.add(wallPosition4);
         Move wallPosition5 = WallPosition(5, 4, "h"); board.add(wallPosition5);
         Move wallPosition6 = WallPosition(4, 4, "v"); board.add(wallPosition6);
+        assert(board.walls().size() == 6);
+        assert(board.existsWall({ 1, 8, "h" }));
+        assert(board.existsWall({ 1, 1, "h" }));
+        assert(board.existsWall({ 4, 8, "v" }));
+        assert(board.existsWall({ 5, 1, "v" }));
+        assert(board.existsWall({ 5, 4, "h" }));
+        assert(board.existsWall({ 4, 4, "v" }));
 
         std::cout << "Board : \n"
             << board << std::endl;
     }
+    std::cout << "test_Board() : END\n\n";
 }
