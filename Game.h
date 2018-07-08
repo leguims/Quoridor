@@ -15,6 +15,23 @@
 #include <ctime>   // localtime
 #include <iomanip> // put_time
 
+class Game;
+
+struct notation {
+    std::string filename;
+    std::string date;
+    std::string rules;
+    std::vector<std::string> players;
+    int rounds;
+    std::string result;
+    std::vector<std::string> moves;
+
+    notation() = default;
+    notation(const std::string&);
+    void save(const std::string&);
+    operator Game*() const;
+};
+
 class Game
 {
 public:
@@ -37,37 +54,32 @@ public:
         return out;
     }
 
-    struct notation{
-        std::string date;
-        std::string rules;
-        std::vector<std::string> players;
-        int rounds;
-        std::string result;
-        std::vector<std::string> moves;
-        operator Game() const;
-    };
     operator notation() const;
 
-
 public:
-    Game() noexcept : board_{ std::make_shared<Board>() }, players_{}, moveList_{}, inGame{ false }, index_player_{ -1 } {};
+    Game() noexcept : board_{ std::make_shared<Board>() }, players_{}, moveList_{}, inGame_{ false }, index_move_{ -1 } {};
     ~Game() = default;
     void chooseReferee();
     void choosePlayers(Player * const p1, Player * const p2);
     void launch();
-    void move();
+    void move(const bool replay = false);
+    std::string filename() const { return filename_; }
+    std::string filename();
+    void filename(const std::string& f) { filename_ = f; }
     std::string save();
+    void replay();
     Result getResult() const;
     const Referee& referee() const { return referee_; }
     void add(const Move &);
     void showMoves(const bool show) { board_->showMoves(show); }
+    const std::vector<std::pair<Move, Move>>& moves() const { return moveList_; }
 
     friend std::ostream& operator<<(std::ostream& out, const Game& game)
     {
         // Save to file the game.
 
         out << "Date : " << game.date() << std::endl;
-        //out << "Filename : " << game.filename() << std::endl;
+        out << "Filename : " << game.filename() << std::endl;
 
         out << "Rules : " << game.referee_ << std::endl;
 
@@ -96,9 +108,9 @@ private:
     std::shared_ptr<Board> board_;
     std::shared_ptr<std::vector<Player*>> players_;
     std::vector<std::pair<Move, Move>> moveList_;
+    std::string filename_;
 
-    bool inGame;
-    int index_player_;
+    bool inGame_;
+    int index_move_;
     std::string date() const;
-    std::string filename() const;
 };

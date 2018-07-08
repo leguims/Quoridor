@@ -29,12 +29,12 @@ const int BoardPosition::y(const std::string& text)
 
 bool BoardPosition::validX(const int x)
 {
-    return ((1 <= x) && (x <= 9));
+    return ((xMin() <= x) && (x <= xMax()));
 }
 
 bool BoardPosition::validY(const int y)
 {
-    return ((1 <= y) && (y <= 9));
+    return ((yMin() <= y) && (y <= yMax()));
 }
 
 void BoardPosition::restore(const std::string &text)
@@ -218,9 +218,11 @@ void Move::restore(const std::string & text)
     switch (type_)
     {
     case Move::Type::pawn:
+    case Move::Type::illegal_pawn:
         player_ = PawnPosition(text);
         break;
     case Move::Type::wall:
+    case Move::Type::illegal_wall:
         wall_ = WallPosition(text);
         break;
     }
@@ -228,10 +230,29 @@ void Move::restore(const std::string & text)
 
 const Move::Type& Move::type(const std::string & text)
 {
-    if (text.size() == 2)
+    PawnPosition p{ 9,9,"gerard" };
+    WallPosition w{ 9,9,"h" };
+
+    Move mp{ p }, mw{ w }, mpi{ p }, mwi{ w }, ms{};
+    mpi.setIllegal(); mwi.setIllegal(); ms.setIllegal();
+
+    std::ostringstream oss;
+    oss.str(""); oss << mp; auto size_pawn = oss.str().size();
+    oss.str(""); oss << mw; auto size_wall = oss.str().size();
+    oss.str(""); oss << mpi; auto size_illegal_pawn = oss.str().size();
+    oss.str(""); oss << mwi; auto size_illegal_wall = oss.str().size();
+    oss.str(""); oss << ms; auto size_surrend = oss.str().size();
+
+    if (text.size() == size_pawn)
         type_ = Type::pawn;
-    else if (text.size() == 3)
+    else if (text.size() == size_wall)
         type_ = Type::wall;
+    else if (text.size() == size_illegal_pawn)
+        type_ = Type::illegal_pawn;
+    else if (text.size() == size_illegal_wall)
+        type_ = Type::illegal_wall;
+    else if (text.size() == size_surrend)
+        type_ = Type::surrend;
     else
         type_ = Type::none;
     return type_;

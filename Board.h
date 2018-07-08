@@ -13,7 +13,7 @@ public:
     using handlerCB = std::function<void(void)>;
 
     Board() noexcept;
-    Board(int width, int height) noexcept : width_{ width }, heigth_{ height }, showMoves_{ false } {}
+    Board(int width, int height) noexcept : width_{ width }, heigth_{ height }, showMoves_{ false }, handler_{nullptr} {}
     ~Board();
 
     void add(const Move & move);
@@ -98,13 +98,13 @@ private:
     int heigth_;
     std::vector<PawnPosition> pawnsPosition_;
     std::vector<WallPosition> wallsPosition_;
-    std::vector<handlerCB> handlers_;
+    handlerCB handler_;
     bool showMoves_;
 
     PawnPosition& getPawnNonConst(const PlayerName& name);
     void add(PawnPosition pawn);
     void add(const WallPosition & wall);
-    void callHandlers();
+    void callHandler();
 };
 
 

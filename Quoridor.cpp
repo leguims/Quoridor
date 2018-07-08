@@ -11,6 +11,7 @@
 
 void test_BoardPosition();
 void test_Board();
+void test_Replay();
 void test_Game_IA_linear();
 void test_Game_IA_random();
 
@@ -18,6 +19,7 @@ int main()
 {
     test_BoardPosition();
     test_Board();
+    test_Replay();
     test_Game_IA_linear();
     test_Game_IA_random();
 
@@ -280,6 +282,50 @@ void test_BoardPosition()
         assert(BoardPosition(6, 8) == wallPosition);
         assert(WallPosition::Direction::vertical == wallPosition.direction());
     }
+
+    {
+        Move illegal1("e1");
+        illegal1.setIllegal();
+        std::cout << "PawnPosition illegal : " << illegal1 << std::endl;
+        std::ostringstream oss;
+        oss << illegal1;
+        Move illegal2(oss.str());
+        std::cout << "Move illegal2 : " << illegal1 << std::endl;
+        assert(illegal1 == illegal2);
+    }
+
+    {
+        Move illegal1("i9");
+        illegal1.setIllegal();
+        std::cout << "PawnPosition illegal : " << illegal1 << std::endl;
+        std::ostringstream oss;
+        oss << illegal1;
+        Move illegal2(oss.str());
+        std::cout << "Move illegal2 : " << illegal1 << std::endl;
+        assert(illegal1 == illegal2);
+    }
+
+    {
+        Move illegal1("e1h");
+        illegal1.setIllegal();
+        std::cout << "WallPosition illegal : " << illegal1 << std::endl;
+        std::ostringstream oss;
+        oss << illegal1;
+        Move illegal2(oss.str());
+        std::cout << "WallPosition illegal2 : " << illegal1 << std::endl;
+        assert(illegal1 == illegal2);
+    }
+
+    {
+        Move illegal1("e1v");
+        illegal1.setIllegal();
+        std::cout << "WallPosition illegal : " << illegal1 << std::endl;
+        std::ostringstream oss;
+        oss << illegal1;
+        Move illegal2(oss.str());
+        std::cout << "WallPosition illegal2 : " << illegal1 << std::endl;
+        assert(illegal1 == illegal2);
+    }
     std::cout << "test_BoardPosition() : END\n\n";
 }
 
@@ -314,4 +360,65 @@ void test_Board()
             << board << std::endl;
     }
     std::cout << "test_Board() : END\n\n";
+}
+
+void test_Replay()
+{
+    std::cout << "test_Replay() : START\n\n";
+    {
+        auto test = [](std::string title, Player *p1, Player *p2, Game::Result result,
+            std::pair<Move, Move>& last, bool showMoves = false)->std::string {
+            std::cout << "test_Game(" << title << ") : START" << std::endl;
+            Game game;
+
+            game.chooseReferee();
+            game.choosePlayers(p1, p2);
+            game.showMoves(showMoves);
+            game.launch();
+            assert(game.getResult() == Game::Result::inProgress);
+
+            while (game.getResult() == Game::Result::inProgress)
+                game.move();
+
+            assert(last == *game.moves().rbegin());
+            assert(game.getResult() == result);
+            std::cout << game;
+            std::cout << "Game result : " << game.getResult() << std::endl;
+            std::cout << "Save game to file : " << game.save() << std::endl;
+            std::cout << "test_Game(" << title << ") : END\n\n";
+            return game.filename();
+        };
+
+        {
+            std::cout << "Play a game" << std::endl;
+            // https://quoridorstrats.files.wordpress.com/2014/09/game-full-with-notation1.png
+            //   Only legal moves.
+            std::vector<std::string> move_list{
+                "e2", "e8",
+                "e3", "e7",
+                "e4", "e6",
+                "e3h", "g6v",
+                "e5", "e4",
+                "e6", "d4",
+                "c3h", "a3h",
+                "e7", "e7h",
+                "d6v", "d4v" // Game not over, player 1 resigns
+            };
+            std::pair<Move, Move> lastMove{ "d6v", "d4v" };
+
+            auto ia1 = new IA_linear("*IA_1: Player 1*", Color::black, BoardPosition("e1"), move_list);
+            auto ia2 = new IA_linear("*IA_1: Player 2*", Color::white, BoardPosition("e9"), move_list);
+            auto filename = test("Test REPLAY 1", ia1, ia2, Game::Result::win2, lastMove);
+            delete ia1, ia2;
+
+            std::cout << "Replay : START" << std::endl;
+            notation replayFile(filename);
+            Game *replay(replayFile);
+            replay->replay();
+            std::cout << *replay;
+            std::cout << "Replay : END" << std::endl;
+            delete replay;
+        }
+    }
+    std::cout << "test_Replay() : END\n\n";
 }

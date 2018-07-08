@@ -15,6 +15,8 @@ Game::operator notation() const
     notation n;
     std::ostringstream oss;
 
+    n.filename = filename();
+
     n.date = date();
 
     oss.str(""); oss << referee_;
@@ -63,107 +65,138 @@ void Game::choosePlayers(Player * const p1, Player * const p2)
 void Game::launch()
 {
     referee_.launch();
-    inGame = true;
+    inGame_ = true;
 }
 
-void Game::move()
+void Game::move(const bool replay)
 {
-    if (!inGame)
+    if (!inGame_)
         return;
 
     // change player
-    index_player_ = ++index_player_ % players_->size();
-    auto round = (index_player_ == 0 ? moveList_.size() + 1 : moveList_.size());
+    auto index_player = ++index_move_ % players_->size();
+    auto round = 1 + index_move_ / players_->size();
     //std::cout << "Round = " << round << std::endl;
-    if (round >= MAX_ROUND)
+    if (!replay && (round >= MAX_ROUND))
     {
-        inGame = false;
+        inGame_ = false;
         return;
     }
 
-    auto& current_player = players_->at(index_player_);
+    auto& current_player = players_->at(index_player);
     auto current_name = current_player->name();
-    auto move = current_player->getNextMove(round, *board_, referee_.getValidPawns(current_name), referee_.getValidWalls(current_name));
-    move.playerName(current_name);
+    Move currentMove;
+    // Ask move to player OR replaying  move list ?
+    if (!replay)
+    {
+        // Ask move to player
+        currentMove = current_player->getNextMove(round, *board_, referee_.getValidPawns(current_name), referee_.getValidWalls(current_name));
+    }
+    else
+    {
+        // Replaying  move list
+        if (index_player == 0)
+            currentMove = moveList_.at(round - 1).first;
+        else
+            currentMove = moveList_.at(round - 1).second;
+    }
+    currentMove.playerName(current_name);
 
-    if (referee_.ValidMove(move))
+    if (referee_.ValidMove(currentMove))
     {
         // Add move to the board
-        board_->add(move);
+        board_->add(currentMove);
 
         // Remove a wall to player
-        if (move.type() == Move::Type::wall)
+        if (currentMove.type() == Move::Type::wall)
             current_player->removeWall();
 
         // Check if game is over
         if (referee_.Win(current_name))
-            inGame = false;
+            inGame_ = false;
     }
     else
     {
-        inGame = false;
-        move.setIllegal();
+        inGame_ = false;
+        currentMove.setIllegal();
         referee_.illegalMove(current_name);
-        if (move.type() == Move::Type::surrend)
+        if (currentMove.type() == Move::Type::surrend)
             std::cout << "Round " << round << " : " << current_name << " does not play and surrenders, game is over." << std::endl;
         else
-            std::cout << "Round " << round << " : " << current_name << " plays invalid move (" << move << "), game is over." << std::endl;
+            std::cout << "Round " << round << " : " << current_name << " plays invalid move (" << currentMove << "), game is over." << std::endl;
     }
 
     // Add move to list
-    if (index_player_ == 0)
-    {
-        // Save player 1 (and "none" for player 2)
-        moveList_.emplace_back(std::make_pair(move, Move()));
-    }
-    else if (index_player_ == 1)
-    {
-        // Save player 2
-        moveList_.at(round - 1).second = move;
-    }
-    else
-    {
-        throw std::out_of_range("Unexpected player " + index_player_);
-    }
+    if (!replay)
+        add(currentMove);
 }
 
-void to_json(json& j, const Game::notation& g) {
-    j = json{ { "Date", g.date },
-    { "Rules", g.rules },
-    { "Players", g.players },
-    { "Rounds", g.rounds },
-    { "Result", g.result },
-    { "moves", g.moves },
+void to_json(json& j, const notation& n) {
+    j = json{ { "Date", n.date },
+    { "Rules", n.rules },
+    { "Players", n.players },
+    { "Rounds", n.rounds },
+    { "Result", n.result },
+    { "moves", n.moves },
     };
 }
 
-void from_json(const json& j, Game::notation& g) {
-    g.date = j.at("Date").get<std::string>();
-    g.rules = j.at("Rules").get<std::string>();
-    g.players = j.at("Players").get<std::vector<std::string>>();
-    g.result = j.at("Rounds").get<int>();
-    g.result = j.at("Result").get<std::string>();
-    g.moves = j.at("moves").get<std::vector<std::string>>();
+void from_json(const json& j, notation& n) {
+    n.date = j.at("Date").get<std::string>();
+    n.rules = j.at("Rules").get<std::string>();
+    n.players = j.at("Players").get<std::vector<std::string>>();
+    n.rounds = j.at("Rounds").get<int>();
+    n.result = j.at("Result").get<std::string>();
+    n.moves = j.at("moves").get<std::vector<std::string>>();
+}
+
+std::string Game::filename()
+{
+    if (filename_.empty())
+    {
+        for (const auto &player : *players_)
+        {
+            filename_ += player->name() + "_";
+        }
+        filename_ += date();
+
+        for (const auto& forbidden : { ':', '/' })
+            std::replace(filename_.begin(), filename_.end(), forbidden, '-');
+
+        for (const auto& forbidden : { ' ', '?', '*' })
+            std::replace(filename_.begin(), filename_.end(), forbidden, '_');
+    }
+
+    return filename_;
 }
 
 std::string Game::save()
 {
-    auto _filename = filename() + ".json";
+    notation n = *this;
+    n.save(filename());
 
-    std::ofstream o(_filename);
-    json j = *this;
-    o << std::setw(4) << j << std::endl;
+    return filename();
+}
 
-    return _filename;
+void Game::replay()
+{
+    if (!moveList_.empty())
+    {
+        showMoves(true);
+        launch();
+
+        while (getResult() == Result::inProgress)
+            move(true);
+    }
 }
 
 Game::Result Game::getResult() const
 {
-    if (inGame)
+    if (inGame_)
         return Game::Result::inProgress;
-    else if (referee_.Win((*players_)[0]->name()))
+    else if (referee_.Win(players_->at(0)->name()))
         return Game::Result::win1;
-    else if (referee_.Win((*players_)[1]->name()))
+    else if (referee_.Win(players_->at(1)->name()))
         return Game::Result::win2;
     else
         return Game::Result::draw;
@@ -175,25 +208,6 @@ void Game::add(const Move &move)
         moveList_.emplace_back(std::make_pair(move, Move()));
     else
         moveList_.rbegin()->second = move;
-}
-
-std::string Game::filename() const
-{
-    std::string _filename;
-
-    for (const auto &player : *players_)
-    {
-        _filename += player->name() + "_";
-    }
-    _filename += date();
-
-    for (const auto& forbidden : { ':', '/' })
-        std::replace(_filename.begin(), _filename.end(), forbidden, '-');
-
-    for (const auto& forbidden : { ' ', '?', '*' })
-        std::replace(_filename.begin(), _filename.end(), forbidden, '_');
-
-    return _filename;
 }
 
 std::string Game::date() const
@@ -208,25 +222,57 @@ std::string Game::date() const
     return oss.str();
 }
 
-Game::notation::operator Game() const
+notation::notation(const std::string& name)
 {
-    Game g;
+    std::ifstream i(name + ".json");
+    if (i.is_open())
+    {
+        json j;
+        i >> j;
 
-    //g.??? = date;
+        *this = j;
+    }
 
-    //g.??? = rules;
+    filename = name;
+}
 
-    //g.players_ = players
+void notation::save(const std::string& name)
+{
+    auto filename = name;
+
+    std::ofstream o(filename + ".json");
+    json j = *this;
+    o << std::setw(4) << j << std::endl;
+}
+
+notation::operator Game*() const
+{
+    auto g = new Game();
+
+    //g->filename = filename
+    g->filename(filename);
+
+    //g->??? = date;
+
+    //g->??? = rules;
+    g->chooseReferee();
+
+    //g->players_ = players
     auto p1 = new Player(players.at(0), Color::black, BoardPosition("e1"));
     auto p2 = new Player(players.at(1), Color::white, BoardPosition("e9"));
-    g.choosePlayers(p1, p2);
+    g->choosePlayers(p1, p2);
 
-    // g.??? = result;
+    // g->??? = result;
 
-    // g.moveList_ = moves
-    for (const auto &move : moves)
+    // g->moveList_ = moves
+    auto move_index = 0;
+    for (const auto &move_txt : moves)
     {
-        g.add(move);
+        Move move(move_txt);
+        if ((move.type() == Move::Type::pawn) || (move.type() == Move::Type::illegal_pawn))
+            move.playerName(players.at(move_index % 2));
+        g->add(move_txt);
+        ++move_index;
     }
 
     return g;

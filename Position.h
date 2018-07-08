@@ -88,6 +88,10 @@ public:
 
     const int x() const override { return Position::x(); }
     const int y() const override { return Position::y(); }
+    const int xMin() const { return 1; }
+    const int yMin() const { return 1; }
+    const int xMax() const { return 9; }
+    const int yMax() const { return 9; }
     const int x(const int x) override;
     const int y(const int y) override;
     const int x(const std::string&) override;
@@ -284,10 +288,32 @@ class Move
 {
 public:
     enum class Type { pawn, wall, illegal_pawn, illegal_wall, surrend, none };
+    friend std::ostream& operator<<(std::ostream& out, const Type& type)
+    {
+        switch (type)
+        {
+        case Move::Type::pawn:
+        case Move::Type::wall:
+            break;
+        case Move::Type::illegal_pawn:
+        case Move::Type::illegal_wall:
+            out << "(illegal)";
+            break;
+        case Move::Type::surrend:
+            out << "(resigns)";
+            break;
+        }
+        return out;
+    }
+
     Move() noexcept : type_{ Type::none }, player_{}, wall_{} {}
     Move(const PawnPosition &player) : type_{ Type::pawn }, player_{ player }, wall_{} {}
     Move(const WallPosition &wall) : type_{ Type::wall }, player_{}, wall_{ wall } {}
-    Move(const std::string &text) : type_{ type(text) }, player_{ type_ == Type::pawn ? PawnPosition(text) : PawnPosition() }, wall_{ type_ == Type::wall ? WallPosition(text) : WallPosition() } {}
+    Move(const std::string &text) : 
+        type_{ type(text) }, 
+        player_{ type_ == Type::pawn || type_ == Type::illegal_pawn ? PawnPosition(text) : PawnPosition() }, 
+        wall_{ type_ == Type::wall || type_ == Type::illegal_wall ? WallPosition(text) : WallPosition() } 
+    {}
 
     void restore(const std::string &move);
     const Type& type(const std::string &text);
@@ -302,22 +328,32 @@ public:
         switch (move.type())
         {
         case Move::Type::pawn:
-            out << (BoardPosition)move.player_; // casted to mask player name
+        case Move::Type::illegal_pawn:
+            out << (BoardPosition)move.player_ << move.type_; // casted to mask player name
             break;
         case Move::Type::wall:
-            out << move.wall_;
-            break;
-        case Move::Type::illegal_pawn:
-            out << (BoardPosition)move.player_ << "(illegal)"; // casted to mask player name
-            break;
         case Move::Type::illegal_wall:
-            out << move.wall_ << "(illegal)";
+            out << move.wall_ << move.type_;
             break;
         case Move::Type::surrend:
-            out << "(resigns)";
+            out << move.type_;
             break;
         }
         return out;
+    }
+
+    friend bool operator==(const Move& lhs, const Move& rhs) {
+        auto pawnType = ((lhs.type_ == Move::Type::pawn) || (lhs.type_ == Move::Type::illegal_pawn));
+        auto pawnEqual = (lhs.player_ == rhs.player_);
+        auto wallType = ((lhs.type_ == Move::Type::wall) || (lhs.type_ == Move::Type::illegal_wall));
+        auto wallEqual = (lhs.wall_ == rhs.wall_);
+
+        return (lhs.type_ == rhs.type_ && (
+            (pawnType && pawnEqual)
+            || (wallType && pawnEqual)
+            || (lhs.type_ == Move::Type::surrend)
+            || (lhs.type_ == Move::Type::none)
+            ));
     }
 
 private:

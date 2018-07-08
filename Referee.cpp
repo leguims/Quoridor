@@ -4,16 +4,19 @@
 
 void Referee::setBoard(const std::shared_ptr<Board> & board)
 {
-    board_ = board;
-    board_->width(9);
-    board_->heigth(9);
+    if (!board_)
+    {
+        board_ = board;
+        board_->width(9);
+        board_->heigth(9);
 
-    board_->registerHandler([this]() {
-        // Action to do when board is changing
-        validPawns_.clear();
-        validwalls_.clear();
-        validMoves_.clear();
-    });
+        board_->registerHandler([this]() {
+            // Action to do when board is changing
+            validPawns_.clear();
+            validwalls_.clear();
+            validMoves_.clear();
+        });
+    }
 }
 
 void Referee::setPlayers(const std::shared_ptr<std::vector<Player*>> & players)
@@ -338,6 +341,8 @@ bool Referee::ValidMove(const Move &move)const
         return ValidPawn(move.pawn());
     case Move::Type::wall:
         return ValidWall(move.wall());
+    case Move::Type::illegal_pawn:
+    case Move::Type::illegal_wall:
     case Move::Type::none:
         return false;
     }

@@ -33,10 +33,10 @@ void Board::add(const WallPosition & wall)
     wallsPosition_.emplace_back(wall);
 }
 
-void Board::callHandlers()
+void Board::callHandler()
 {
-    for (const auto& h : handlers_)
-        h();
+    if(handler_)
+        handler_();
 }
 
 void Board::add(const Move & move)
@@ -45,11 +45,11 @@ void Board::add(const Move & move)
     {
     case Move::Type::pawn:
         add(move.pawn());
-        callHandlers();
+        callHandler();
         break;
     case Move::Type::wall:
         add(move.wall());
-        callHandlers();
+        callHandler();
         break;
     case Move::Type::none:
         break;
@@ -63,7 +63,7 @@ void Board::add(const Move & move)
 
 void Board::registerHandler(const handlerCB &&handler)
 {
-    handlers_.push_back(std::move(handler));
+    handler_ = std::move(handler);
 }
 
 PawnPosition& Board::getPawnNonConst(const PlayerName& name)
