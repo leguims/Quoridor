@@ -343,6 +343,7 @@ bool Referee::ValidMove(const Move &move)const
         return ValidWall(move.wall());
     case Move::Type::illegal_pawn:
     case Move::Type::illegal_wall:
+    case Move::Type::surrend:
     case Move::Type::none:
         return false;
     }

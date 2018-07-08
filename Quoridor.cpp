@@ -74,7 +74,8 @@ void test_Game_IA_random()
 
 void test_Game_IA_linear()
 {
-    auto test = [](std::string title, Player *p1, Player *p2, Game::Result result, bool showMoves = false) {
+        auto test = [](std::string title, Player *p1, Player *p2, Game::Result result,
+            std::pair<Move, Move>& last_move, bool showMoves = false) {
         std::cout << "test_Game(" << title << ") : START" << std::endl;
         Game game;
 
@@ -87,6 +88,7 @@ void test_Game_IA_linear()
         while (game.getResult() == Game::Result::inProgress)
             game.move();
 
+        assert(last_move == *game.moves().rbegin());
         assert(game.getResult() == result);
         std::cout << game;
         std::cout << "Game result : " << game.getResult() << std::endl;
@@ -107,10 +109,11 @@ void test_Game_IA_linear()
             "e7", "e7h",
             "d6v", "d4v" // Game not over, player 1 resigns
         };
+        std::pair<Move, Move> lastMove{ "(resigns)", "" };
 
         auto ia1 = new IA_linear("*IA_1: Player 1*", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("*IA_1: Player 2*", Color::white, BoardPosition("e9"), move_list);
-        test("Test 1", ia1, ia2, Game::Result::win2);
+        test("Test 1", ia1, ia2, Game::Result::win2, lastMove);
         delete ia1, ia2;
     }
 
@@ -128,10 +131,11 @@ void test_Game_IA_linear()
             "e8", "d3", // e8 illegal because of "e7h" !
             "e9", "d2"
         };
+        std::pair<Move, Move> lastMove{ "e8(illegal)", "" };
 
         auto ia1 = new IA_linear("*Player 1*", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("*Player 2*", Color::white, BoardPosition("e9"), move_list);
-        test("Test 2", ia1, ia2, Game::Result::win2);
+        test("Test 2", ia1, ia2, Game::Result::win2, lastMove);
         delete ia1, ia2;
     }
 
@@ -147,10 +151,11 @@ void test_Game_IA_linear()
             "c4v", "d4", // Illegal c4v, pawn is in jail !
             "d5", "e5",
         };
+        std::pair<Move, Move> lastMove{ "c4v(illegal)", "" };
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test 3", ia1, ia2, Game::Result::win2);
+        test("Test 3", ia1, ia2, Game::Result::win2, lastMove);
         delete ia1, ia2;
     }
 
@@ -166,10 +171,11 @@ void test_Game_IA_linear()
             "e7", "d1", // Player 2 wins, end of game.
             "e8", "e1",
         };
+        std::pair<Move, Move> lastMove{ "e7", "d1" };
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test 4", ia1, ia2, Game::Result::win2);
+        test("Test 4", ia1, ia2, Game::Result::win2, lastMove);
         delete ia1, ia2;
     }
 
@@ -179,10 +185,11 @@ void test_Game_IA_linear()
             "b5v", "b6v",  // Illegal b6v, wall cannot use b6v twice !
             "e3", "e7",
         };
+        std::pair<Move, Move> lastMove{ "b5v", "b6v(illegal)" };
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test 5", ia1, ia2, Game::Result::win1);
+        test("Test 5", ia1, ia2, Game::Result::win1, lastMove);
         delete ia1, ia2;
     }
 
@@ -195,10 +202,11 @@ void test_Game_IA_linear()
             "g1", "b9",  // Illegal b9, cannot jump over the wall b8v !
             "f1", "c9",
         };
+        std::pair<Move, Move> lastMove{ "g1", "b9(illegal)" };
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test 6", ia1, ia2, Game::Result::win1);
+        test("Test 6", ia1, ia2, Game::Result::win1, lastMove);
         delete ia1, ia2;
     }
 
@@ -207,13 +215,14 @@ void test_Game_IA_linear()
             "e2", "e8",
             "e3", "e7",
             "e4", "e6",
-            "e5", "e5", // Illegal move, e5 is not empty.
+            "e5", "e5", // Illegal move of player 2, e5 is not empty.
             "g6v", "d4",
         };
+        std::pair<Move, Move> lastMove{ "e5", "e5(illegal)" };
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test Cyprien 1", ia1, ia2, Game::Result::win1);
+        test("Test Cyprien 1", ia1, ia2, Game::Result::win1, lastMove);
         delete ia1, ia2;
     }
 
@@ -227,10 +236,11 @@ void test_Game_IA_linear()
             "f6", "e5",
             "f7", "e4",
         };
+        std::pair<Move, Move> lastMove{ "c6h", "d6h(illegal)" };
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test Cyprien 2", ia1, ia2, Game::Result::win1);
+        test("Test Cyprien 2", ia1, ia2, Game::Result::win1, lastMove);
         delete ia1, ia2;
     }
 
@@ -239,10 +249,11 @@ void test_Game_IA_linear()
             "e2", "i1", // Illegal move, i1 is too far from e9.
             "e3", "e7",
         };
+        std::pair<Move, Move> lastMove{ "e2", "i1(illegal)" };
 
         auto ia1 = new IA_linear("Player 1", Color::black, BoardPosition("e1"), move_list);
         auto ia2 = new IA_linear("Player 2", Color::white, BoardPosition("e9"), move_list);
-        test("Test Cyprien 3", ia1, ia2, Game::Result::win1);
+        test("Test Cyprien 3", ia1, ia2, Game::Result::win1, lastMove);
         delete ia1, ia2;
     }
 }
@@ -367,7 +378,7 @@ void test_Replay()
     std::cout << "test_Replay() : START\n\n";
     {
         auto test = [](std::string title, Player *p1, Player *p2, Game::Result result,
-            std::pair<Move, Move>& last, bool showMoves = false)->std::string {
+            std::pair<Move, Move>& last_move, bool showMoves = false)->std::string {
             std::cout << "test_Game(" << title << ") : START" << std::endl;
             Game game;
 
@@ -380,7 +391,7 @@ void test_Replay()
             while (game.getResult() == Game::Result::inProgress)
                 game.move();
 
-            assert(last == *game.moves().rbegin());
+            assert(last_move == *game.moves().rbegin());
             assert(game.getResult() == result);
             std::cout << game;
             std::cout << "Game result : " << game.getResult() << std::endl;
@@ -404,7 +415,7 @@ void test_Replay()
                 "e7", "e7h",
                 "d6v", "d4v" // Game not over, player 1 resigns
             };
-            std::pair<Move, Move> lastMove{ "d6v", "d4v" };
+            std::pair<Move, Move> lastMove{ "(resigns)", "" };
 
             auto ia1 = new IA_linear("*IA_1: Player 1*", Color::black, BoardPosition("e1"), move_list);
             auto ia2 = new IA_linear("*IA_1: Player 2*", Color::white, BoardPosition("e9"), move_list);

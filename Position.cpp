@@ -74,7 +74,7 @@ WallPosition::WallPosition(const BoardPosition & a, const BoardPosition & b, con
         }
         else
         {
-            // take b + (0, -1)
+            // take a + (0, -1)
             x(a.x());
             y(a.y() - 1);
             direction(Direction::vertical);
@@ -91,9 +91,9 @@ WallPosition::WallPosition(const BoardPosition & a, const BoardPosition & b, con
         }
         else
         {
-            // take b + (0, -1)
-            x(b.x());
-            y(b.y() - 1);
+            // take b + (-1, 0)
+            x(b.x() - 1);
+            y(b.y());
             direction(Direction::horizontal);
         }
     }
@@ -108,9 +108,9 @@ WallPosition::WallPosition(const BoardPosition & a, const BoardPosition & b, con
         }
         else
         {
-            // take b + (0, -1)
-            x(a.x());
-            y(a.y() - 1);
+            // take a + (-1, 0)
+            x(a.x() - 1);
+            y(a.y());
             direction(Direction::horizontal);
         }
     }
