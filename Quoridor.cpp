@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <thread>
+#include <chrono>
 
 // #define NDEBUG
 #include <cassert>
@@ -21,7 +22,16 @@ int main()
     test_Board();
     test_Replay();
     test_Game_IA_linear();
-    test_Game_IA_random();
+
+    auto start = std::chrono::system_clock::now();
+    auto end = start;
+    std::cout << "Loop on Random IA ..." << std::endl;
+    do
+    {
+        test_Game_IA_random();
+        end = std::chrono::system_clock::now();
+    } while (std::chrono::duration_cast<std::chrono::seconds>(end - start).count() < 300); //60s
+    std::cout << "End of loop on Random IA." << std::endl;
 
     {
         using namespace std::chrono_literals;
