@@ -154,6 +154,7 @@ std::string Game::filename()
 {
     if (filename_.empty())
     {
+        filename_ += "saved_games\\";
         for (const auto &player : *players_)
         {
             filename_ += player->name() + "_";
