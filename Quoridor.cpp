@@ -146,14 +146,131 @@ void main_pdcurses_helloworld()
 void main_pdcurses_board()
 {
     initscr();                  /* Start curses mode */
+    // COLS, LINES which are initialized to the screen sizes after initscr()
     raw();				        /* Line buffering disabled	*/
     keypad(stdscr, TRUE);		/* We get F1, F2 etc..		*/
     noecho();			        /* Don't echo() while we do getch */
+
     //halfdelay(5);             /* Set timeout with getch() */
     // cbreak();                /* Don't wait EOF to give input */
     // noecho();                /* Don't print on screen keys pressed */
+    // getmaxyx(stdscr, row, col);		/* find the boundaries of the screeen */
+    // getyx(stdscr, y, x);		/* get the current curser position */
+    // attron(A_BOLD);			/* cut bold on */
+    // attroff(A_BOLD);			/* cut bold off */
+    // box(local_win, 0 , 0); /* Draw a box around the window */
+    // wborder(local_win, ' ', ' ', ' ',' ',' ',' ',' ',' '); /* Erase the box */
+    // mvaddstr(y, x, string);
 
-    printw("Hello World !!!");    /* Print Hello World */
+    if (has_colors() == FALSE)
+    {
+        endwin();
+        std::cout << "Your terminal does not support color\n";
+        exit(1);
+    }
+    start_color();			/* Start color 			*/
+
+    { // Draw board
+        auto h_legend = "  a b c d e f g h i  ";
+        auto h_void = "                     ";
+        auto max_y = 8 * 2 + 1 + 2 - 1;
+        auto max_x = 9 * 2 + 3 - 1;
+
+        // Adjust or define color
+        // init_color(COLOR_RED, 700, 0, 0);
+        /* param 1     : color name
+        * param 2, 3, 4 : rgb content min = 0, max = 1000 */
+
+        // init_pair(index, foreground color, background color);
+        auto legend_index = 1;
+        auto pawn_index = 2;
+        auto wall_empty_index = 3;
+        auto wall_full_index = 4;
+        init_pair(legend_index, COLOR_WHITE, COLOR_BLACK);
+        init_pair(pawn_index, COLOR_WHITE, 52); // Brown
+        init_pair(wall_empty_index, COLOR_WHITE, 234);
+        init_pair(wall_full_index, COLOR_WHITE, 88);
+        auto legend_color = COLOR_PAIR(legend_index);
+        auto pawn_color = COLOR_PAIR(pawn_index);
+        auto wall_empty_color = COLOR_PAIR(wall_empty_index);
+        auto wall_full_color = COLOR_PAIR(wall_full_index);
+
+        for (int y = 0; y <= max_y; ++y)
+        {
+            // Print text
+            if ((y == 0) || (y == max_y))
+            {
+                attron(legend_color);       // Print colors
+                mvaddstr(y, 0, h_legend);
+            }
+            else
+            {
+                attron(wall_empty_color);   // Print colors
+                mvaddstr(y, 0, h_void);
+                mvchgat(y, 0, 2, A_NORMAL, legend_color, NULL);
+                mvchgat(y, max_x - 1, 2, A_NORMAL, legend_color, NULL);
+                if ((y % 2) != 0)
+                {
+                    // Add line legend
+                    attron(legend_color);   // Print colors
+                    mvaddch(y, 0, '9' - ((y - 1) / 2));
+                    mvaddch(y, max_x, '9' - ((y - 1) / 2));
+                    for (int x = 2; x <= (max_x - 2); ++x)
+                    {
+                        if ((x % 2) == 0)
+                        {
+                            // mvchgat(y, x, length, attribute, color_index, NULL);
+                            /*
+                            * First two parameters specify the position at which to start
+                            * Third parameter number of characters to update. -1 means till
+                            * end of line
+                            * Forth parameter is the normal attribute you wanted to give
+                            * to the charcter
+                            * Fifth is the color index. It is the index given during init_pair()
+                            * use 0 if you didn't want color
+                            * Sixth one is always NULL
+                            */
+                            mvchgat(y, x, 1, A_NORMAL, pawn_index, NULL);
+                        }
+                        else
+                        {
+                            mvchgat(y, x, 1, A_NORMAL, wall_empty_index, NULL);
+                        }
+                    }
+                }
+            }
+        }
+        //mvaddstr(0, 0, "  a b c d e f g h i  ");
+        //mvaddstr(1, 0, "9                   9");
+        //mvaddstr(2, 0, "                     ");
+        //mvaddstr(2, 0, "8                   8");
+        //mvaddstr(2, 0, "                     ");
+        //mvaddstr(3, 0, "7                   7");
+        //mvaddstr(2, 0, "                     ");
+        //mvaddstr(4, 0, "6                   6");
+        //mvaddstr(2, 0, "                     ");
+        //mvaddstr(5, 0, "5                   5");
+        //mvaddstr(2, 0, "                     ");
+        //mvaddstr(6, 0, "4                   4");
+        //mvaddstr(2, 0, "                     ");
+        //mvaddstr(7, 0, "3                   3");
+        //mvaddstr(2, 0, "                     ");
+        //mvaddstr(8, 0, "2                   2");
+        //mvaddstr(2, 0, "                     ");
+        //mvaddstr(9, 0, "1                   1");
+        //mvaddstr(10, 0, "  a b c d e f g h i  ");
+    } // Draw board : END
+
+    // Loop to watch colors available
+    //for (int i = 0; i < 512; ++i)
+    //{
+    //    init_pair(i % COLOR_PAIRS, COLOR_WHITE, i);
+    //    attron(COLOR_PAIR(i % COLOR_PAIRS));
+    //    printw(" %i", i);
+    //    getch();
+    //}
+    //printw(" COLOR_PAIRS = %i", COLOR_PAIRS);    /* Print Hello World */
+
     refresh();                    /* Print it on to the real screen */
 
     getch();                      /* Wait for user input */
@@ -242,8 +359,8 @@ void test_Game_IA_random()
 
 void test_Game_IA_linear()
 {
-        auto test = [](std::string title, Player *p1, Player *p2, Game::Result result,
-            std::pair<Move, Move>& last_move, bool showMoves = false) {
+    auto test = [](std::string title, Player *p1, Player *p2, Game::Result result,
+        std::pair<Move, Move>& last_move, bool showMoves = false) {
         std::cout << "test_Game(" << title << ") : START" << std::endl;
         Game game;
 
