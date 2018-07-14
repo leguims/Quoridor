@@ -150,6 +150,8 @@ void main_pdcurses_board()
     keypad(stdscr, TRUE);		/* We get F1, F2 etc..		*/
     noecho();			        /* Don't echo() while we do getch */
     //halfdelay(5);             /* Set timeout with getch() */
+    // cbreak();                /* Don't wait EOF to give input */
+    // noecho();                /* Don't print on screen keys pressed */
 
     printw("Hello World !!!");    /* Print Hello World */
     refresh();                    /* Print it on to the real screen */
