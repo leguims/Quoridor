@@ -266,7 +266,9 @@ void main_pdcurses_board()
     //{
     //    init_pair(i % COLOR_PAIRS, COLOR_WHITE, i);
     //    attron(COLOR_PAIR(i % COLOR_PAIRS));
-    //    printw(" %i", i);
+    //    printw(" %3i", i);
+    //    if ((i % 18) == 0)
+    //        printw("\n");
     //    getch();
     //}
     //printw(" COLOR_PAIRS = %i", COLOR_PAIRS);    /* Print Hello World */
