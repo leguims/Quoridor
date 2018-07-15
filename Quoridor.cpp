@@ -171,10 +171,10 @@ void main_pdcurses_board()
     start_color();			/* Start color 			*/
 
     { // Draw board
-        auto h_legend = "  a b c d e f g h i  ";
-        auto h_void = "                     ";
+        auto h_legend = " a b c d e f g h i ";
+        auto h_void = "                   ";
         auto max_y = 8 * 2 + 1 + 2 - 1;
-        auto max_x = 9 * 2 + 3 - 1;
+        auto max_x = 9 * 2 + 1 - 1;
 
         // Adjust or define color
         // init_color(COLOR_RED, 700, 0, 0);
@@ -200,24 +200,27 @@ void main_pdcurses_board()
             // Print text
             if ((y == 0) || (y == max_y))
             {
+                // Add column's legend
                 attron(legend_color);       // Print colors
                 mvaddstr(y, 0, h_legend);
             }
             else
             {
-                attron(wall_empty_color);   // Print colors
+                // Print line as empty wall
+                attron(wall_empty_color);
                 mvaddstr(y, 0, h_void);
-                mvchgat(y, 0, 2, A_NORMAL, legend_color, NULL);
-                mvchgat(y, max_x - 1, 2, A_NORMAL, legend_color, NULL);
+                // Restore line's color legend 
+                mvchgat(y, 0, 1, A_NORMAL, legend_color, NULL);
+                mvchgat(y, max_x, 1, A_NORMAL, legend_color, NULL);
+
                 if ((y % 2) != 0)
                 {
-                    // Add line legend
-                    attron(legend_color);   // Print colors
+                    // Add line text legend
                     mvaddch(y, 0, '9' - ((y - 1) / 2));
                     mvaddch(y, max_x, '9' - ((y - 1) / 2));
-                    for (int x = 2; x <= (max_x - 2); ++x)
+                    for (int x = 1; x <= (max_x - 1); ++x)
                     {
-                        if ((x % 2) == 0)
+                        if ((x % 2) != 0)
                         {
                             // mvchgat(y, x, length, attribute, color_index, NULL);
                             /*
@@ -230,10 +233,12 @@ void main_pdcurses_board()
                             * use 0 if you didn't want color
                             * Sixth one is always NULL
                             */
+                            // Restore pawn color square
                             mvchgat(y, x, 1, A_NORMAL, pawn_index, NULL);
                         }
                         else
                         {
+                            // Restore wall color square
                             mvchgat(y, x, 1, A_NORMAL, wall_empty_index, NULL);
                         }
                     }
