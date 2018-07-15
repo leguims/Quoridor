@@ -5,6 +5,8 @@
 #include <thread>
 #include <chrono>
 
+#include <vector>
+
 // #define NDEBUG
 #include <cassert>
 
@@ -189,7 +191,7 @@ void main_pdcurses_board()
         init_pair(legend_index, COLOR_WHITE, COLOR_BLACK);
         init_pair(pawn_index, COLOR_WHITE, 52); // Brown
         init_pair(wall_empty_index, COLOR_WHITE, 234);
-        init_pair(wall_full_index, COLOR_WHITE, 88);
+        init_pair(wall_full_index, COLOR_WHITE, 214);
         auto legend_color = COLOR_PAIR(legend_index);
         auto pawn_color = COLOR_PAIR(pawn_index);
         auto wall_empty_color = COLOR_PAIR(wall_empty_index);
@@ -265,6 +267,80 @@ void main_pdcurses_board()
         //mvaddstr(9, 0, "1                   1");
         //mvaddstr(10, 0, "  a b c d e f g h i  ");
     } // Draw board : END
+
+    { // Draw Pawn
+        struct position { int x; int y; };
+        // Inputs
+        auto old_pos = position{ 1,1 };
+        auto new_pos = position{ 5,1 };
+        auto new_pos2 = position{ 1,1 };
+        auto new_pos3 = position{ 1,9 };
+        auto new_pos4 = position{ 9,1 };
+        auto new_pos5 = position{ 9,9 };
+        auto color = 3;
+        auto player_number = 1;
+        auto pawn_style = 1;
+
+        // Adjust or define color
+        // init_color(COLOR_RED, 700, 0, 0);
+        /* param 1     : color name
+        * param 2, 3, 4 : rgb content min = 0, max = 1000 */
+
+        // init_pair(index, foreground color, background color);
+        auto pcl = std::vector<int>{ COLOR_BLACK, COLOR_BLUE, COLOR_GREEN, COLOR_RED, COLOR_WHITE };
+        auto psl = std::vector<char>{ 'O', 'X', '#', '@' };
+        auto erase_pawn = ' ';
+        auto pawn_index = 2;
+        init_pair(pawn_index, COLOR_WHITE, 52); // Brown
+        auto pawn_color = COLOR_PAIR(pawn_index);
+        auto player_index = player_number + 4;
+        init_pair(player_index, color, pcl[color]);
+        auto player_color = COLOR_PAIR(player_index);
+
+        attron(pawn_color | A_BOLD);
+        mvaddch(19 - old_pos.y * 2, old_pos.x * 2 - 1, erase_pawn);
+        attron(player_color | A_BOLD);
+        for (const auto &p : { new_pos, new_pos2, new_pos3, new_pos4, new_pos5 })
+        {
+            mvaddch(19 - p.y * 2, p.x * 2 - 1, psl[pawn_style++%psl.size()]);
+        }
+    } // Draw Pawn : END
+
+    { // Draw Wall
+        struct position { int x; int y; char direction; };
+        // Inputs
+        auto new_pos = position{ 5,1, 'h' };
+        auto new_pos2 = position{ 1,1, 'v' };
+        auto new_pos3 = position{ 1,8, 'h' };
+        auto new_pos4 = position{ 8,1, 'v' };
+        auto new_pos5 = position{ 8,8, 'v' };
+        auto new_pos6 = position{ 1,1, 'h' };
+
+        // Adjust or define color
+        // init_color(COLOR_RED, 700, 0, 0);
+        /* param 1     : color name
+        * param 2, 3, 4 : rgb content min = 0, max = 1000 */
+
+        // init_pair(index, foreground color, background color);
+        auto wall_empty_index = 3;
+        auto wall_full_index = 4;
+        init_pair(wall_empty_index, COLOR_WHITE, 234);
+        init_pair(wall_full_index, COLOR_WHITE, 214);
+        auto wall_empty_color = COLOR_PAIR(wall_empty_index);
+        auto wall_full_color = COLOR_PAIR(wall_full_index);
+
+        for (const auto &p : { new_pos, new_pos2, new_pos3, new_pos4, new_pos5, new_pos6 })
+        {
+            if (p.direction == 'h')
+                mvchgat(19 - p.y * 2 - 1, p.x * 2 - 1, 3, A_NORMAL, wall_full_index, NULL);
+            else
+            {
+                mvchgat(19 - p.y * 2 - 2, p.x * 2, 1, A_NORMAL, wall_full_index, NULL);
+                mvchgat(19 - p.y * 2 - 1, p.x * 2, 1, A_NORMAL, wall_full_index, NULL);
+                mvchgat(19 - p.y * 2, p.x * 2, 1, A_NORMAL, wall_full_index, NULL);
+            }
+        }
+    } // Draw Wall : END
 
     // Loop to watch colors available
     //for (int i = 0; i < 512; ++i)
