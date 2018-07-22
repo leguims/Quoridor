@@ -2,6 +2,7 @@
 
 #include "Position.h"
 #include "a-star/source/AStar.hpp"
+#include "Display.h"
 
 #include <vector>
 #include <map>
@@ -18,6 +19,7 @@ public:
 
     void add(const Move & move);
     void registerHandler(const handlerCB &&);
+    void display();
 
     const PawnPosition& getPawn(const PlayerName& name) const;
     const std::vector<PawnPosition>& pawns() const { return pawnsPosition_; }
@@ -100,6 +102,7 @@ private:
     std::vector<WallPosition> wallsPosition_;
     handlerCB handler_;
     bool showMoves_;
+    Display *p_display_;
 
     PawnPosition& getPawnNonConst(const PlayerName& name);
     void add(PawnPosition pawn);

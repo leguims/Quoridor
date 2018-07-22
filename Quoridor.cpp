@@ -374,12 +374,13 @@ void main_pdcurses()
 
 int main()
 {
-    main_pdcurses();
+    //main_pdcurses();
 
     test_BoardPosition();
     test_Board();
     test_Replay();
     test_Game_IA_linear();
+    //test_Game_IA_random();
 
     auto start = std::chrono::system_clock::now();
     auto end = start;
@@ -428,14 +429,14 @@ void test_Game_IA_random()
     {
         auto ia1 = new IA_random_pawn("IA_random_pawn.1", Color::black, BoardPosition("e1"));
         auto ia2 = new IA_random_pawn("IA_random_pawn.2", Color::white, BoardPosition("e9"));
-        test("Test Random pawn 1", ia1, ia2, false);
+        test("Test Random pawn 1", ia1, ia2, true);
         delete ia1, ia2;
     }
 
     {
         auto ia1 = new IA_random_wall_pawn("IA_random_wall_pawn.1", Color::black, BoardPosition("e1"));
         auto ia2 = new IA_random_wall_pawn("IA_random_wall_pawn.2", Color::white, BoardPosition("e9"));
-        test("Test Random wall/pawn 1", ia1, ia2, false);
+        test("Test Random wall/pawn 1", ia1, ia2, true);
         delete ia1, ia2;
     }
 }
@@ -443,7 +444,7 @@ void test_Game_IA_random()
 void test_Game_IA_linear()
 {
     auto test = [](std::string title, Player *p1, Player *p2, Game::Result result,
-        std::pair<Move, Move>& last_move, bool showMoves = false) {
+        std::pair<Move, Move>& last_move, bool showMoves = true) {
         std::cout << "test_Game(" << title << ") : START" << std::endl;
         Game game;
 
@@ -713,6 +714,7 @@ void test_Board()
     std::cout << "test_Board() : START\n\n";
     {
         Board board;
+        board.showMoves(true);
 
         Move michou = PawnPosition(5, 1, "Michou", Color::black); board.add(michou);
         michou = PawnPosition(5, 2, "Michou"); board.add(michou);
@@ -746,7 +748,7 @@ void test_Replay()
     std::cout << "test_Replay() : START\n\n";
     {
         auto test = [](std::string title, Player *p1, Player *p2, Game::Result result,
-            std::pair<Move, Move>& last_move, bool showMoves = false)->std::string {
+            std::pair<Move, Move>& last_move, bool showMoves = true)->std::string {
             std::cout << "test_Game(" << title << ") : START" << std::endl;
             Game game;
 

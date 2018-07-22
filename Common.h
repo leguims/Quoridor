@@ -4,7 +4,7 @@
 
 using PlayerName = std::string;
 
-enum class Color { none, red, blue, white, black };
+enum class Color { none, red, green, blue, white, black };
 inline std::ostream& operator<<(std::ostream& out, const Color& color)
 {
     switch (color)
@@ -14,6 +14,9 @@ inline std::ostream& operator<<(std::ostream& out, const Color& color)
         break;
     case Color::blue:
         out << 'U';
+        break;
+    case Color::green:
+        out << 'G';
         break;
     case Color::red:
         out << 'R';
@@ -25,3 +28,20 @@ inline std::ostream& operator<<(std::ostream& out, const Color& color)
     return out;
 }
 
+inline std::string color(Color c)
+{
+    switch (c)
+    {
+    case Color::black:
+        return "black";
+    case Color::blue:
+        return "blue";
+    case Color::green:
+        return "green";
+    case Color::red:
+        return "red";
+    case Color::white:
+        return "white";
+    }
+    return "";
+}
