@@ -150,7 +150,7 @@ namespace Quoridor {
                 init_pair(static_cast<short>(target_), COLOR_WHITE, 52);
             else if ((color == "black") || (color == "b"))
                 init_pair(static_cast<short>(target_), COLOR_BLACK, 52);
-            color_[target_] = COLOR_PAIR(player_number);
+            color_[target_] = COLOR_PAIR(target_);
         }
 
         if (!pawn_style.empty())
@@ -206,19 +206,47 @@ namespace Quoridor {
         ::refresh();
     }
 
+#ifdef HAVE_WIDE
+    wchar_t DisplayPDCurses::pawnStyle(std::string pawn_style)
+    {
+        std::transform(pawn_style.begin(), pawn_style.end(), pawn_style.begin(), ::tolower);
+
+        if ((pawn_style == "circle") || (pawn_style == "smile"))
+            return 0x263B;
+        else if ((pawn_style == "cross") || (pawn_style == "spade"))
+            return 0x2660;
+        else if ((pawn_style == "hashtag") || (pawn_style == "club"))
+            return 0x2663;
+        else if ((pawn_style == "arobase") || (pawn_style == "heart"))
+            return 0x2665;
+        else if ((pawn_style == "star") || (pawn_style == "diamond"))
+            return 0x2666;
+        else if ((pawn_style == "dollar") || (pawn_style == "triangle"))
+            return 0x25B2;
+        else if (pawn_style == "erase")
+            return 0x0020;
+        return 0x263B;
+    }
+#else
     char DisplayPDCurses::pawnStyle(std::string pawn_style)
     {
         std::transform(pawn_style.begin(), pawn_style.end(), pawn_style.begin(), ::tolower);
-        if (pawn_style == "circle")
+
+        if ((pawn_style == "circle") || (pawn_style == "smile"))
             return 'O';
-        else if (pawn_style == "cross")
+        else if ((pawn_style == "cross") || (pawn_style == "spade"))
             return 'X';
-        else if (pawn_style == "hashtag")
+        else if ((pawn_style == "hashtag") || (pawn_style == "club"))
             return '#';
-        else if (pawn_style == "arobase")
+        else if ((pawn_style == "arobase") || (pawn_style == "heart"))
             return '@';
+        else if ((pawn_style == "star") || (pawn_style == "diamond"))
+            return '*';
+        else if ((pawn_style == "dollar") || (pawn_style == "triangle"))
+            return '$';
         else if (pawn_style == "erase")
             return ' ';
         return 'X';
     }
+#endif
 }

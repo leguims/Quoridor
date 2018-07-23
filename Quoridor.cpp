@@ -19,6 +19,7 @@ void test_Game_IA_linear();
 void test_Game_IA_random();
 
 
+#define HAVE_WIDE
 #include "PDCurses/curses.h"
 
 static int next_j(int j)
@@ -236,12 +237,12 @@ void main_pdcurses_board()
                             * Sixth one is always NULL
                             */
                             // Restore pawn color square
-                            mvchgat(y, x, 1, A_NORMAL, pawn_index, NULL);
+                            mvchgat(y, x, 1, A_NORMAL, pawn_index, NULL); refresh();
                         }
                         else
                         {
                             // Restore wall color square
-                            mvchgat(y, x, 1, A_NORMAL, wall_empty_index, NULL);
+                            mvchgat(y, x, 1, A_NORMAL, wall_empty_index, NULL); refresh();
                         }
                     }
                 }
@@ -277,9 +278,9 @@ void main_pdcurses_board()
         auto new_pos3 = position{ 1,9 };
         auto new_pos4 = position{ 9,1 };
         auto new_pos5 = position{ 9,9 };
-        auto color = 3;
+        auto color = 0;
         auto player_number = 1;
-        auto pawn_style = 1;
+        auto pawn_style = 0;
 
         // Adjust or define color
         // init_color(COLOR_RED, 700, 0, 0);
@@ -288,21 +289,31 @@ void main_pdcurses_board()
 
         // init_pair(index, foreground color, background color);
         auto pcl = std::vector<int>{ COLOR_BLACK, COLOR_BLUE, COLOR_GREEN, COLOR_RED, COLOR_WHITE };
+#ifdef HAVE_WIDE
+        // SPADE , CLUB, heart, DIAMOND, smile, triangle
+        auto psl = std::vector<wchar_t>{ 0x2660, 0x2663 , 0x2665 , 0x2666, 0x263B, 0x25B2 };
+#else
         auto psl = std::vector<char>{ 'O', 'X', '#', '@' };
+#endif
         auto erase_pawn = ' ';
         auto pawn_index = 2;
         init_pair(pawn_index, COLOR_WHITE, 52); // Brown
         auto pawn_color = COLOR_PAIR(pawn_index);
         auto player_index = player_number + 4;
-        init_pair(player_index, color, pcl[color]);
-        auto player_color = COLOR_PAIR(player_index);
+        //init_pair(player_index, color, pcl[color%pcl.size()]);
+        //auto player_color = COLOR_PAIR(player_index);
 
         attron(pawn_color | A_BOLD);
         mvaddch(19 - old_pos.y * 2, old_pos.x * 2 - 1, erase_pawn);
-        attron(player_color | A_BOLD);
-        for (const auto &p : { new_pos, new_pos2, new_pos3, new_pos4, new_pos5 })
+        for (const auto &p : { new_pos, new_pos2, new_pos3, new_pos4, new_pos5, position{ 1,4 }, position{ 2,4 }, position{ 3,4 }, position{ 4,4 }, position{ 5,4 }, position{ 6,4 }, position{ 7,4 }, position{ 8,4 } })
         {
-            mvaddch(19 - p.y * 2, p.x * 2 - 1, psl[pawn_style++%psl.size()]);
+            init_pair(player_index, pcl[color%pcl.size()], 52);
+            auto player_color = COLOR_PAIR(player_index);
+            attron(player_color | A_BOLD);
+            mvaddch(19 - p.y * 2, p.x * 2 - 1, psl[pawn_style%psl.size()]); refresh();
+            ++player_index;
+            ++color;
+            ++pawn_style;
         }
     } // Draw Pawn : END
 
@@ -427,15 +438,15 @@ void test_Game_IA_random()
     };
 
     {
-        auto ia1 = new IA_random_pawn("IA_random_pawn.1", Color::black, BoardPosition("e1"));
+        auto ia1 = new IA_random_pawn("IA_random_pawn.1", Color::blue, BoardPosition("e1"));
         auto ia2 = new IA_random_pawn("IA_random_pawn.2", Color::white, BoardPosition("e9"));
         test("Test Random pawn 1", ia1, ia2, true);
         delete ia1, ia2;
     }
 
     {
-        auto ia1 = new IA_random_wall_pawn("IA_random_wall_pawn.1", Color::black, BoardPosition("e1"));
-        auto ia2 = new IA_random_wall_pawn("IA_random_wall_pawn.2", Color::white, BoardPosition("e9"));
+        auto ia1 = new IA_random_wall_pawn("IA_random_wall_pawn.1", Color::green, BoardPosition("e1"));
+        auto ia2 = new IA_random_wall_pawn("IA_random_wall_pawn.2", Color::red, BoardPosition("e9"));
         test("Test Random wall/pawn 1", ia1, ia2, true);
         delete ia1, ia2;
     }
