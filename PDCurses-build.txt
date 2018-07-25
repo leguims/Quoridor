@@ -1,0 +1,13 @@
+Source : https://stackoverflow.com/questions/42708392/install-pdcurses-on-visual-studio-2017
+
+My process:
+	- Launch "Developper Command Prompt for VS 2017":
+	- Change directory to root of Quoridor repository
+	- set PDCURSES_SRCDIR=..
+	- cd PDCurses\win32a &&  echo "Win32a build : start" && nmake –f vcwin32.mak clean && nmake –f vcwin32.mak && cd ..\.. && echo "Win32a build : ok"
+
+pdcurses.lib is in "PDCurses\win32a".
+
+In Projet properties (Visual studio IDE) : 
+    - Add "$(ProjectDir)PDCurses\" to "Configuration/C++/General/Other include directories"
+	- Add "$(ProjectDir)PDCurses\win32a\pdcurses.lib" to  "Configuration/Link editor/Input/dependances"

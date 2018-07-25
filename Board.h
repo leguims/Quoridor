@@ -2,6 +2,7 @@
 
 #include "Position.h"
 #include "a-star/source/AStar.hpp"
+#include "Display.h"
 
 #include <vector>
 #include <map>
@@ -13,11 +14,12 @@ public:
     using handlerCB = std::function<void(void)>;
 
     Board() noexcept;
-    Board(int width, int height) noexcept : width_{ width }, heigth_{ height }, showMoves_{ false }, handler_{nullptr} {}
+    Board(int width, int height) noexcept : width_{ width }, heigth_{ height }, showMoves_{ false }, p_display_(nullptr), handler_{nullptr} {}
     ~Board();
 
     void add(const Move & move);
     void registerHandler(const handlerCB &&);
+    void display();
 
     const PawnPosition& getPawn(const PlayerName& name) const;
     const std::vector<PawnPosition>& pawns() const { return pawnsPosition_; }
@@ -100,6 +102,7 @@ private:
     std::vector<WallPosition> wallsPosition_;
     handlerCB handler_;
     bool showMoves_;
+    Quoridor::Display::Display *p_display_;
 
     PawnPosition& getPawnNonConst(const PlayerName& name);
     void add(PawnPosition pawn);

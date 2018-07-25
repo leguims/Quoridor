@@ -3,8 +3,11 @@
 #include <algorithm>
 #include <iostream>
 
+#include "DisplayPDCurses.h"
+
 Board::Board() noexcept : width_{ 0 }, heigth_{ 0 }
 {
+    p_display_ = new Quoridor::Display::PDCurses();
 }
 
 Board::~Board()
@@ -25,6 +28,9 @@ void Board::add(PawnPosition pawn)
     {
         // New pawn : Add it
         pawnsPosition_.emplace_back(pawn);
+
+        // Initialize pawn style on display
+        if(p_display_) p_display_->pawn(pawnsPosition_.size(), pawn.color(), (pawnsPosition_.size() == 1 ? PawnStyle::cross : PawnStyle::circle));
     }
 }
 
@@ -35,7 +41,7 @@ void Board::add(const WallPosition & wall)
 
 void Board::callHandler()
 {
-    if(handler_)
+    if (handler_)
         handler_();
 }
 
@@ -58,12 +64,32 @@ void Board::add(const Move & move)
     }
 
     if (showMoves_)
+    {
         std::cout << "Board status : \n" << *this << std::endl;
+        display();
+    }
 }
 
 void Board::registerHandler(const handlerCB &&handler)
 {
     handler_ = std::move(handler);
+}
+
+void Board::display()
+{
+    if (p_display_)
+    {
+        p_display_->Board();
+
+        for (auto& p : pawnsPosition_)
+            p_display_->pawn(p, (pawnsPosition_[0].playerName() == p.playerName() ? 1 : 2));
+
+        for (auto& w : wallsPosition_)
+            p_display_->wall(w);
+
+        // Force to refresh the display
+        p_display_->refresh();
+    }
 }
 
 PawnPosition& Board::getPawnNonConst(const PlayerName& name)
