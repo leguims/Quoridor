@@ -102,7 +102,7 @@ private:
     std::vector<WallPosition> wallsPosition_;
     handlerCB handler_;
     bool showMoves_;
-    Display *p_display_;
+    Quoridor::Display::Display *p_display_;
 
     PawnPosition& getPawnNonConst(const PlayerName& name);
     void add(PawnPosition pawn);

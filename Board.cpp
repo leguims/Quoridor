@@ -7,7 +7,7 @@
 
 Board::Board() noexcept : width_{ 0 }, heigth_{ 0 }
 {
-    p_display_ = new Quoridor::DisplayPDCurses();
+    p_display_ = new Quoridor::Display::PDCurses();
 }
 
 Board::~Board()
@@ -30,7 +30,7 @@ void Board::add(PawnPosition pawn)
         pawnsPosition_.emplace_back(pawn);
 
         // Initialize pawn style on display
-        p_display_->pawn(pawnsPosition_.size(), color(pawn.color()), (pawnsPosition_.size() == 1 ? "cross" : "circle"));
+        p_display_->pawn(pawnsPosition_.size(), pawn.color(), (pawnsPosition_.size() == 1 ? PawnStyle::cross : PawnStyle::circle));
     }
 }
 
