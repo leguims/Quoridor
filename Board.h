@@ -14,7 +14,7 @@ public:
     using handlerCB = std::function<void(void)>;
 
     Board() noexcept;
-    Board(int width, int height) noexcept : width_{ width }, heigth_{ height }, showMoves_{ false }, handler_{nullptr} {}
+    Board(int width, int height) noexcept : width_{ width }, heigth_{ height }, showMoves_{ false }, p_display_(nullptr), handler_{nullptr} {}
     ~Board();
 
     void add(const Move & move);

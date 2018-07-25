@@ -30,7 +30,7 @@ void Board::add(PawnPosition pawn)
         pawnsPosition_.emplace_back(pawn);
 
         // Initialize pawn style on display
-        p_display_->pawn(pawnsPosition_.size(), pawn.color(), (pawnsPosition_.size() == 1 ? PawnStyle::cross : PawnStyle::circle));
+        if(p_display_) p_display_->pawn(pawnsPosition_.size(), pawn.color(), (pawnsPosition_.size() == 1 ? PawnStyle::cross : PawnStyle::circle));
     }
 }
 
@@ -77,16 +77,19 @@ void Board::registerHandler(const handlerCB &&handler)
 
 void Board::display()
 {
-    p_display_->Board();
+    if (p_display_)
+    {
+        p_display_->Board();
 
-    for (auto& p : pawnsPosition_)
-        p_display_->pawn(p, (pawnsPosition_[0].playerName() == p.playerName() ? 1 : 2));
+        for (auto& p : pawnsPosition_)
+            p_display_->pawn(p, (pawnsPosition_[0].playerName() == p.playerName() ? 1 : 2));
 
-    for (auto& w : wallsPosition_)
-        p_display_->wall(w);
+        for (auto& w : wallsPosition_)
+            p_display_->wall(w);
 
-    // Force to refresh the display
-    p_display_->refresh();
+        // Force to refresh the display
+        p_display_->refresh();
+    }
 }
 
 PawnPosition& Board::getPawnNonConst(const PlayerName& name)
