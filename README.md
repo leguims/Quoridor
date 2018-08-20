@@ -18,8 +18,8 @@ A Quoridor AI in progress written in C++.
 * [ ] IA uses KNOWLEDGE map to play (define game style from hash table)
 * [ ] Fill KNOWLEDGE with saved game.
 
-### EPIC "IA":
-* [ ] Define DISCOVER IA : try to play move never played before or the least played. Useless to increase DATABASE.
+### EPIC "IA Database":
+* [ ] Define DISCOVER IA : try to play never played or the least played move. Use to increase DATABASE.
 * [ ] Define WINNER IA : try to play the best move or surrend if no move is winable. Customize with minimum win rate to play.
 * [ ] Define ROMANTIC IA : try to play move with the worst draw rate or surrend. Customize with maximum draw rate to play.
 * [ ] Define MODEST IA : try to play move with the worst lose rate or surrend. Customize with maximum lose rate to play.
@@ -27,6 +27,19 @@ A Quoridor AI in progress written in C++.
 ### EPIC "OPTIMISE DATABASE":
 * scan saved game and show equivalent game files.
 
+### EPIC "Analytics":
+* [ ] Create class ANALYTICS which will be used from IA to play.
+* [ ] Create several features as [Lisa Glendenning's thesis](https://pdfs.semanticscholar.org/acad/6962a9bb3eb3fde4272f476d6625eb0a8182.pdf).
+* [ ] Create several features as [Mertens agent](https://project.dke.maastrichtuniversity.nl/games/files/bsc/Mertens_BSc-paper.pdf).
+* [ ] Create SET WALL_LIST <WallPosition>
+* [ ] Create SET PAWN_LIST <PawnPosition>
+* [ ] Constructor need move list.
+* [ ] Method add take a feature and its coefficient to apply for evaluations
+* [ ] Method evaluate take a "board picture+move" and return score
+
+### EPIC "IA Analytics":
+* [ ] Define ??? IA : define an analytic IA.
+ 
 ## Done list
 
 ### EPIC "PDCurses":
